@@ -1,9 +1,6 @@
 package com.example.timetrackerapp
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
@@ -66,12 +63,28 @@ fun BlockOfWorkDetailedView(
                     label = { Text("Start time") }
                 )
             }
-            OutlinedTextField(
-                value = duration.renderDuration(),
-                onValueChange = onTaskChanged,
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Duration") }
-            )
+            if (blockOfWork.state == BlockOfWork.State.FINISHED) {
+                Box {
+                    OutlinedTextField(
+                        value = "${duration.inWholeMinutes}",
+                        onValueChange = onTaskChanged,
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Duration") }
+                    )
+                    Text(
+                        text = "min",
+                        modifier = Modifier.align(Alignment.CenterEnd)
+                            .padding(end = 14.dp, top = 3.dp),
+                    )
+                }
+            } else {
+                OutlinedTextField(
+                    value = duration.renderDuration(),
+                    onValueChange = onTaskChanged,
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Duration") }
+                )
+            }
             if (blockOfWork.state == BlockOfWork.State.FINISHED) {
                 Row {
                     OutlinedTextField(
