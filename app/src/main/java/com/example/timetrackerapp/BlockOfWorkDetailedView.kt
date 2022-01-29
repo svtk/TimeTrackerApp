@@ -2,6 +2,7 @@ package com.example.timetrackerapp
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.OutlinedTextField
@@ -29,46 +30,69 @@ fun BlockOfWorkDetailedView(
     onFinishClicked: () -> Unit,
     onBackClicked: () -> Unit,
 ) {
-    Column(modifier = Modifier.padding(4.dp)) {
+    Column(Modifier.padding(8.dp)) {
+        OutlinedTextField(
+            value = blockOfWork.description.value,
+            onValueChange = onDescriptionChanged,
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Description") }
+        )
         OutlinedTextField(
             value = blockOfWork.project.value,
             onValueChange = onProjectChanged,
-            label = { Text("Project") }
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Project") },
         )
         OutlinedTextField(
             value = blockOfWork.task.value,
             onValueChange = onTaskChanged,
+            modifier = Modifier.fillMaxWidth(),
             label = { Text("Task") }
         )
-        OutlinedTextField(
-            value = blockOfWork.description.value,
-            onValueChange = onDescriptionChanged,
-            label = { Text("Description") }
-        )
         if (blockOfWork.state != BlockOfWork.State.CREATED) {
-            OutlinedTextField(
-                value = blockOfWork.startTime.renderTime(),
-                onValueChange = { },
-                readOnly = true,
-                label = { Text("Start time") }
-            )
-            if (blockOfWork.state == BlockOfWork.State.FINISHED) {
+            Row {
                 OutlinedTextField(
-                    value = blockOfWork.finishTime.renderTime(),
+                    value = blockOfWork.startTime.renderDate(),
                     onValueChange = { },
+                    modifier = Modifier.fillMaxWidth(0.5f),
                     readOnly = true,
-                    label = { Text("Finish time") }
+                    label = { Text("Start date") }
+                )
+                OutlinedTextField(
+                    value = blockOfWork.startTime.renderTime(),
+                    onValueChange = { },
+                    modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+                    readOnly = true,
+                    label = { Text("Start time") }
                 )
             }
             OutlinedTextField(
                 value = duration.renderDuration(),
                 onValueChange = onTaskChanged,
-                label = { Text("Time passed") }
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Duration") }
             )
+            if (blockOfWork.state == BlockOfWork.State.FINISHED) {
+                Row {
+                    OutlinedTextField(
+                        value = blockOfWork.finishTime.renderDate(),
+                        onValueChange = { },
+                        modifier = Modifier.fillMaxWidth(0.5f),
+                        readOnly = true,
+                        label = { Text("End date") }
+                    )
+                    OutlinedTextField(
+                        value = blockOfWork.finishTime.renderTime(),
+                        onValueChange = { },
+                        modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+                        readOnly = true,
+                        label = { Text("End time") }
+                    )
+                }
+            }
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(2.dp)
         ) {
             if (blockOfWork.state == BlockOfWork.State.CREATED) {
                 OutlinedButton(onClick = onStartClicked) {
@@ -96,7 +120,7 @@ fun BlockOfWorkDetailedView(
 
 @Preview(showBackground = true)
 @Composable
-fun RunningTaskPreview() {
+fun BlockOfWorkDetailedViewPreview() {
     TimeTrackerAppTheme {
         BlockOfWorkDetailedView(
             blockOfWork = BlockOfWork(
@@ -104,10 +128,13 @@ fun RunningTaskPreview() {
                 project = Project("my project"),
                 task = Task("my task"),
                 description = Description("my work"),
-                state = BlockOfWork.State.RUNNING,
-                intervals = listOf()
+                state = BlockOfWork.State.FINISHED,
+                intervals = listOf(
+                    testTimeInterval("2022-01-26T11:30", Duration.minutes(20)),
+                    testTimeInterval("2022-01-26T13:00", Duration.minutes(30)),
+                )
             ),
-            duration = Duration.seconds(100),
+            duration = Duration.minutes(50),
             onProjectChanged = {},
             onTaskChanged = {},
             onDescriptionChanged = {},

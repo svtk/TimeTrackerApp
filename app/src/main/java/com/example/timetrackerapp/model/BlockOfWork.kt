@@ -1,9 +1,13 @@
 package com.example.timetrackerapp.model
 
 import kotlinx.datetime.*
+import kotlinx.datetime.TimeZone
+import java.time.format.TextStyle
+import java.util.*
 import kotlin.time.Duration
 
 data class BlockOfWork(
+    val id: Int,
     val project: Project,
     val task: Task,
     val description: Description,
@@ -90,6 +94,9 @@ private fun renderTimeComponents(hours: Int, minutes: Int, seconds: Int? = null)
             if (seconds != null) ":${renderTimeComponent(seconds)}" else ""
 
 private fun renderTimeComponent(timeComponent: Int) = "%02d".format(timeComponent)
+
+fun LocalDateTime.renderDate(): String =
+    "${dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)}, $dayOfMonth ${month.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)}"
 
 fun LocalDateTime.renderTime(): String =
     renderTimeComponents(hour, minute)
