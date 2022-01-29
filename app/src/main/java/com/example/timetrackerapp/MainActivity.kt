@@ -34,61 +34,83 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// TODO
-enum class ScreenState { RUNNING_BLOCK_OF_WORK, BLOCK_LIST }
-
 @Composable
 fun MainScreen() {
-    var screenState by remember { mutableStateOf(ScreenState.BLOCK_LIST) }
+    var chosenBlockId by remember { mutableStateOf<Int?>(null) }
     var currentDescription by remember { mutableStateOf("") }
 
-    val coroutineScope = rememberCoroutineScope()
-    val runningBlockOfWorkStore = remember { RunningBlockOfWorkStore(coroutineScope) }
-
     var finishedBlocks by remember { mutableStateOf(listOf<BlockOfWork>()) }
+
+    val coroutineScope = rememberCoroutineScope()
+    val runningBlockOfWorkStore = remember {
+        RunningBlockOfWorkStore(
+            coroutineScope,
+            nextId = { (finishedBlocks.maxOfOrNull { it.id } ?: 0) + 1 }
+        )
+    }
 
     val onCurrentBlockFinished = {
         runningBlockOfWorkStore.onFinishClicked()
         finishedBlocks += runningBlockOfWorkStore.blockOfWork!!
         runningBlockOfWorkStore.clearTimeBlock()
-        screenState = ScreenState.BLOCK_LIST
+        chosenBlockId = null
     }
     Column {
-        if (screenState == ScreenState.BLOCK_LIST) {
+        if (chosenBlockId == null) {
             if (runningBlockOfWorkStore.blockOfWork == null) {
                 StartingNewBlock(
                     text = currentDescription,
                     onTextUpdate = { newText -> currentDescription = newText },
                     onNewTask = {
-                        runningBlockOfWorkStore.startNewTimeBlock(currentDescription)
+                        val id = runningBlockOfWorkStore.startNewTimeBlock(currentDescription)
                         currentDescription = ""
-                        screenState = ScreenState.RUNNING_BLOCK_OF_WORK
+                        chosenBlockId = id
                     }
                 )
             } else {
                 BlockOfWorkCard(
                     blockOfWork = runningBlockOfWorkStore.blockOfWork!!,
+                    onCardClicked = { chosenBlockId = runningBlockOfWorkStore.blockOfWork!!.id },
                     onStartClicked = runningBlockOfWorkStore::onStartClicked,
                     onPauseClicked = runningBlockOfWorkStore::onPauseClicked,
                     onResumeClicked = runningBlockOfWorkStore::onResumeClicked,
                     onFinishClicked = onCurrentBlockFinished,
                 )
             }
-            BlockOfWorkListContent(finishedBlocks)
+            BlockOfWorkListContent(
+                blocks = finishedBlocks,
+                onBlockClicked = { id -> chosenBlockId = id }
+            )
 
         } else {
-            BlockOfWorkDetailedView(
-                blockOfWork = runningBlockOfWorkStore.blockOfWork!!,
-                duration = runningBlockOfWorkStore.getCurrentDuration().value,
-                onProjectChanged = runningBlockOfWorkStore::onProjectChanged,
-                onTaskChanged = runningBlockOfWorkStore::onTaskChanged,
-                onDescriptionChanged = runningBlockOfWorkStore::onDescriptionChanged,
-                onStartClicked = runningBlockOfWorkStore::onStartClicked,
-                onPauseClicked = runningBlockOfWorkStore::onPauseClicked,
-                onResumeClicked = runningBlockOfWorkStore::onResumeClicked,
-                onFinishClicked = onCurrentBlockFinished,
-                onBackClicked = { screenState = ScreenState.BLOCK_LIST }
-            )
+            if (chosenBlockId == runningBlockOfWorkStore.blockOfWork?.id) {
+                BlockOfWorkDetailedView(
+                    blockOfWork = runningBlockOfWorkStore.blockOfWork!!,
+                    duration = runningBlockOfWorkStore.getCurrentDuration().value,
+                    onProjectChanged = runningBlockOfWorkStore::onProjectChanged,
+                    onTaskChanged = runningBlockOfWorkStore::onTaskChanged,
+                    onDescriptionChanged = runningBlockOfWorkStore::onDescriptionChanged,
+                    onStartClicked = runningBlockOfWorkStore::onStartClicked,
+                    onPauseClicked = runningBlockOfWorkStore::onPauseClicked,
+                    onResumeClicked = runningBlockOfWorkStore::onResumeClicked,
+                    onFinishClicked = onCurrentBlockFinished,
+                    onBackClicked = { chosenBlockId = null }
+                )
+            } else {
+                val block = finishedBlocks.first { it.id == chosenBlockId }
+                BlockOfWorkDetailedView(
+                    blockOfWork = block,
+                    duration = block.duration,
+                    onProjectChanged = {},
+                    onTaskChanged = {},
+                    onDescriptionChanged = {},
+                    onStartClicked = {},
+                    onPauseClicked = {},
+                    onResumeClicked = {},
+                    onFinishClicked = {},
+                    onBackClicked = { chosenBlockId = null }
+                )
+            }
         }
     }
 }

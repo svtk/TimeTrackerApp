@@ -7,7 +7,10 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlin.time.Duration
 
-class RunningBlockOfWorkStore(coroutineScope: CoroutineScope) {
+class RunningBlockOfWorkStore(
+    coroutineScope: CoroutineScope,
+    private val nextId: () -> Int
+) {
     var blockOfWork: BlockOfWork? by mutableStateOf(null)
         private set
 
@@ -25,14 +28,16 @@ class RunningBlockOfWorkStore(coroutineScope: CoroutineScope) {
         blockOfWork = null
     }
 
-    fun startNewTimeBlock(description: String) {
+    fun startNewTimeBlock(description: String): Int {
         blockOfWork = BlockOfWork(
+            nextId(),
             Project(""),
             Task(""),
             Description(description),
             BlockOfWork.State.RUNNING,
             listOf(OpenTimeInterval())
         )
+        return blockOfWork!!.id
     }
 
     private inline fun setState(update: BlockOfWork.() -> BlockOfWork) {

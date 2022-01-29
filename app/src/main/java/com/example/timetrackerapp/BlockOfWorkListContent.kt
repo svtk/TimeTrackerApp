@@ -1,5 +1,6 @@
 package com.example.timetrackerapp
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.timetrackerapp.model.*
 import com.example.timetrackerapp.ui.theme.TimeTrackerAppTheme
@@ -20,11 +22,15 @@ import kotlinx.datetime.toInstant
 import kotlin.time.Duration
 
 @Composable
-fun BlockOfWorkListContent(blocks: List<BlockOfWork>) {
+fun BlockOfWorkListContent(
+    blocks: List<BlockOfWork>,
+    onBlockClicked: (id: Int) -> Unit
+) {
     LazyColumn {
         items(blocks) { block ->
             BlockOfWorkCard(
                 blockOfWork = block,
+                onCardClicked = onBlockClicked,
                 onStartClicked = { },
                 onPauseClicked = { },
                 onResumeClicked = { },
@@ -37,13 +43,14 @@ fun BlockOfWorkListContent(blocks: List<BlockOfWork>) {
 @Composable
 fun BlockOfWorkCard(
     blockOfWork: BlockOfWork,
+    onCardClicked: (id: Int) -> Unit,
     onStartClicked: () -> Unit,
     onPauseClicked: () -> Unit,
     onResumeClicked: () -> Unit,
     onFinishClicked: () -> Unit,
 ) {
     Card {
-        Column {
+        Column(modifier = Modifier.clickable(onClick = { onCardClicked(blockOfWork.id) })) {
             Text(text = "${blockOfWork.project.value}: ${blockOfWork.task.value}")
             Text(text = blockOfWork.description.value)
             val finishTimeText =
@@ -81,8 +88,9 @@ fun BlockOfWorkCard(
 fun BlockOfWorkListPreview() {
     TimeTrackerAppTheme {
         BlockOfWorkListContent(
-            listOf(
+            blocks = listOf(
                 BlockOfWork(
+                    id = 0,
                     project = Project("project 1"),
                     task = Task("task 1"),
                     description = Description("description 1"),
@@ -93,6 +101,7 @@ fun BlockOfWorkListPreview() {
                     state = BlockOfWork.State.FINISHED,
                 ),
                 BlockOfWork(
+                    id = 1,
                     project = Project("project 2"),
                     task = Task("task 2"),
                     description = Description("description 2"),
@@ -102,7 +111,8 @@ fun BlockOfWorkListPreview() {
                     ),
                     state = BlockOfWork.State.FINISHED,
                 ),
-            )
+            ),
+            onBlockClicked = {}
         )
     }
 }

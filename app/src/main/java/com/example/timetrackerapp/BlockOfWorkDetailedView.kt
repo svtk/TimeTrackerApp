@@ -100,6 +100,7 @@ fun RunningTaskPreview() {
     TimeTrackerAppTheme {
         BlockOfWorkDetailedView(
             blockOfWork = BlockOfWork(
+                id = 0,
                 project = Project("my project"),
                 task = Task("my task"),
                 description = Description("my work"),
