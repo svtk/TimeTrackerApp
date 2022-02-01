@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.timetrackerapp.model.*
@@ -70,6 +71,8 @@ fun BlockOfWorkCard(
                     Text(
                         modifier = Modifier.fillMaxWidth(0.5f),
                         style = MaterialTheme.typography.body1,
+                        overflow = TextOverflow.Ellipsis,
+                        softWrap = false,
                         text = if (blockOfWork.project.value.isNotEmpty())
                             blockOfWork.project.value +
                                     if (blockOfWork.task.value.isNotEmpty()) ": ${blockOfWork.task.value}" else ""
@@ -86,6 +89,8 @@ fun BlockOfWorkCard(
                     Text(
                         modifier = Modifier.fillMaxWidth(0.5f),
                         style = MaterialTheme.typography.caption,
+                        overflow = TextOverflow.Ellipsis,
+                        softWrap = false,
                         text = blockOfWork.description.value,
                     )
                     val finishTimeText =
@@ -155,7 +160,7 @@ fun testTimeBlocks() = listOf(
         id = 0,
         project = Project("project 1"),
         task = Task("task 1"),
-        description = Description("description 1"),
+        description = Description("short description"),
         intervals = listOf(
             testTimeInterval("2022-01-05T10:00", Duration.minutes(10)),
             testTimeInterval("2022-01-05T10:20", Duration.minutes(15)),
@@ -164,9 +169,9 @@ fun testTimeBlocks() = listOf(
     ),
     BlockOfWork(
         id = 1,
-        project = Project("project 2"),
-        task = Task("task 2"),
-        description = Description("description 2"),
+        project = Project("project 2 - very long title"),
+        task = Task("task 2 - also long"),
+        description = Description("very long second description"),
         intervals = listOf(
             testTimeInterval("2022-01-26T11:30", Duration.minutes(20)),
             testTimeInterval("2022-01-26T13:00", Duration.minutes(30)),
