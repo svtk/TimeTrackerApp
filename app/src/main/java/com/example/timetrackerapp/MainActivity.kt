@@ -62,6 +62,10 @@ fun MainScreen() {
     if (chosenBlockId == null) {
         MainView(
             runningBlockOfWorkStore.blockOfWork,
+            if (runningBlockOfWorkStore.blockOfWork != null)
+                runningBlockOfWorkStore.getCurrentDuration().value
+            else
+                null,
             finishedBlocks,
             currentDescription,
             onTextUpdate,

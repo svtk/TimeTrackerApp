@@ -33,6 +33,7 @@ fun BlockOfWorkListContent(
         items(blocks) { block ->
             BlockOfWorkCard(
                 blockOfWork = block,
+                duration = block.duration,
                 onCardClicked = onBlockClicked,
                 onStartClicked = { },
                 onPauseClicked = { },
@@ -46,6 +47,7 @@ fun BlockOfWorkListContent(
 @Composable
 fun BlockOfWorkCard(
     blockOfWork: BlockOfWork,
+    duration: Duration,
     onCardClicked: (id: Int) -> Unit,
     onStartClicked: () -> Unit,
     onPauseClicked: () -> Unit,
@@ -74,7 +76,7 @@ fun BlockOfWorkCard(
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.End,
                         style = MaterialTheme.typography.body1,
-                        text = blockOfWork.duration.renderDuration(),
+                        text = duration.renderDuration(),
                     )
                 }
                 Row {

@@ -11,11 +11,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.timetrackerapp.model.*
 import com.example.timetrackerapp.ui.theme.TimeTrackerAppTheme
+import kotlin.time.Duration
 
 
 @Composable
 fun MainView(
     blockOfWork: BlockOfWork?,
+    duration: Duration?,
     finishedBlocks: List<BlockOfWork>,
     currentDescription: String,
     onTextUpdate: (String) -> Unit,
@@ -37,6 +39,7 @@ fun MainView(
             } else {
                 BlockOfWorkCard(
                     blockOfWork = blockOfWork,
+                    duration = duration ?: blockOfWork.duration,
                     onCardClicked = { onCardClicked(blockOfWork.id) },
                     onStartClicked = onStartClicked,
                     onPauseClicked = onPauseClicked,
@@ -94,6 +97,7 @@ fun MainScreenRunningTaskPreview() {
                 BlockOfWork.State.RUNNING,
                 testTimeIntervals(),
             ),
+            duration = null,
             finishedBlocks = testTimeBlocks(),
             currentDescription = "",
             onTextUpdate = {},
@@ -113,6 +117,7 @@ fun MainScreenChoosingTaskPreview() {
     TimeTrackerAppTheme {
         MainView(
             blockOfWork = null,
+            duration = null,
             finishedBlocks = testTimeBlocks(),
             currentDescription = "",
             onTextUpdate = {},
