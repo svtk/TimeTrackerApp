@@ -132,30 +132,7 @@ fun BlockOfWorkCard(
 fun BlockOfWorkListPreview() {
     TimeTrackerAppTheme {
         BlockOfWorkListContent(
-            blocks = listOf(
-                BlockOfWork(
-                    id = 0,
-                    project = Project("project 1"),
-                    task = Task("task 1"),
-                    description = Description("description 1"),
-                    intervals = listOf(
-                        testTimeInterval("2022-01-05T10:00", Duration.minutes(10)),
-                        testTimeInterval("2022-01-05T10:20", Duration.minutes(15)),
-                    ),
-                    state = BlockOfWork.State.FINISHED,
-                ),
-                BlockOfWork(
-                    id = 1,
-                    project = Project("project 2"),
-                    task = Task("task 2"),
-                    description = Description("description 2"),
-                    intervals = listOf(
-                        testTimeInterval("2022-01-26T11:30", Duration.minutes(20)),
-                        testTimeInterval("2022-01-26T13:00", Duration.minutes(30)),
-                    ),
-                    state = BlockOfWork.State.FINISHED,
-                ),
-            ),
+            blocks = testTimeBlocks(),
             onBlockClicked = {}
         )
     }
@@ -167,3 +144,28 @@ fun testTimeInterval(isoDate: String, duration: Duration) =
             TimeZone.currentSystemDefault()
         ), duration
     )
+
+fun testTimeBlocks() = listOf(
+    BlockOfWork(
+        id = 0,
+        project = Project("project 1"),
+        task = Task("task 1"),
+        description = Description("description 1"),
+        intervals = listOf(
+            testTimeInterval("2022-01-05T10:00", Duration.minutes(10)),
+            testTimeInterval("2022-01-05T10:20", Duration.minutes(15)),
+        ),
+        state = BlockOfWork.State.FINISHED,
+    ),
+    BlockOfWork(
+        id = 1,
+        project = Project("project 2"),
+        task = Task("task 2"),
+        description = Description("description 2"),
+        intervals = listOf(
+            testTimeInterval("2022-01-26T11:30", Duration.minutes(20)),
+            testTimeInterval("2022-01-26T13:00", Duration.minutes(30)),
+        ),
+        state = BlockOfWork.State.FINISHED,
+    ),
+)

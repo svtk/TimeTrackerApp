@@ -142,10 +142,7 @@ fun BlockOfWorkDetailedViewPreview() {
                 task = Task("my task"),
                 description = Description("my work"),
                 state = BlockOfWork.State.FINISHED,
-                intervals = listOf(
-                    testTimeInterval("2022-01-26T11:30", Duration.minutes(20)),
-                    testTimeInterval("2022-01-26T13:00", Duration.minutes(30)),
-                )
+                intervals = testTimeIntervals()
             ),
             duration = Duration.minutes(50),
             onProjectChanged = {},
@@ -159,3 +156,9 @@ fun BlockOfWorkDetailedViewPreview() {
         )
     }
 }
+
+@Composable
+fun testTimeIntervals() = listOf(
+    testTimeInterval("2022-01-26T11:30", Duration.minutes(20)),
+    testTimeInterval("2022-01-26T13:00", Duration.minutes(30)),
+)
