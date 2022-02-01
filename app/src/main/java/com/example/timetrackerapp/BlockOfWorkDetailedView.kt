@@ -1,17 +1,21 @@
 package com.example.timetrackerapp
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.timetrackerapp.model.*
 import com.example.timetrackerapp.model.Task
 import com.example.timetrackerapp.ui.theme.TimeTrackerAppTheme
+import kotlinx.datetime.LocalDateTime
 import kotlin.time.Duration
 
 @Composable
@@ -28,100 +32,154 @@ fun BlockOfWorkDetailedView(
     onBackClicked: () -> Unit,
 ) {
     Column(Modifier.padding(8.dp)) {
-        OutlinedTextField(
-            value = blockOfWork.description.value,
-            onValueChange = onDescriptionChanged,
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text("Description") }
+        BlockOfWorkItem(
+            "Description", blockOfWork.description.value, onDescriptionChanged
         )
-        OutlinedTextField(
-            value = blockOfWork.project.value,
-            onValueChange = onProjectChanged,
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text("Project") },
+        BlockOfWorkItem(
+            "Project", blockOfWork.project.value, onProjectChanged
         )
-        OutlinedTextField(
-            value = blockOfWork.task.value,
-            onValueChange = onTaskChanged,
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text("Task") }
+        BlockOfWorkItem(
+            "Task", blockOfWork.task.value, onTaskChanged
         )
         if (blockOfWork.state != BlockOfWork.State.CREATED) {
-            Row {
-                OutlinedTextField(
-                    value = blockOfWork.startTime.renderDate(),
-                    onValueChange = { },
-                    modifier = Modifier.fillMaxWidth(0.5f),
-                    readOnly = true,
-                    label = { Text("Start date") }
-                )
-                OutlinedTextField(
-                    value = blockOfWork.startTime.renderTime(),
-                    onValueChange = { },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 8.dp),
-                    readOnly = true,
-                    label = { Text("Start time") }
-                )
-            }
-            OutlinedTextField(
-                value = duration.renderDuration(blockOfWork.state),
-                onValueChange = onTaskChanged,
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Duration") }
+            DateTimeFields(
+                blockOfWork.startTime, "Start date", "Start time"
             )
             if (blockOfWork.state == BlockOfWork.State.FINISHED) {
-                Row {
-                    OutlinedTextField(
-                        value = blockOfWork.finishTime.renderDate(),
-                        onValueChange = { },
-                        modifier = Modifier.fillMaxWidth(0.5f),
-                        readOnly = true,
-                        label = { Text("End date") }
-                    )
-                    OutlinedTextField(
-                        value = blockOfWork.finishTime.renderTime(),
-                        onValueChange = { },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 8.dp),
-                        readOnly = true,
-                        label = { Text("End time") }
-                    )
-                }
+                BlockOfWorkItem(
+                    "Duration", duration.renderDurationFinished(), {}
+                )
+            } else {
+                Text(
+                    text = duration.renderDurationLive(),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp, bottom = 20.dp),
+                    style = MaterialTheme.typography.h4.copy(fontWeight = FontWeight.Bold),
+                )
+            }
+            if (blockOfWork.state == BlockOfWork.State.FINISHED) {
+                DateTimeFields(
+                    blockOfWork.finishTime, "End date", "End time"
+                )
             }
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (blockOfWork.state == BlockOfWork.State.CREATED) {
-                OutlinedButton(onClick = onStartClicked) {
-                    Text("START")
+            when (blockOfWork.state) {
+                BlockOfWork.State.CREATED -> {
+                    OutlinedButton(onClick = onStartClicked) {
+                        Text("START")
+                    }
                 }
-            }
-            if (blockOfWork.state == BlockOfWork.State.PAUSED) {
-                OutlinedButton(onClick = onResumeClicked) {
-                    Text("RESUME")
+                BlockOfWork.State.PAUSED -> {
+                    TwoButtons(
+                        leftTitle = "RESUME",
+                        rightTitle = "FINISH",
+                        onLeftClicked = onResumeClicked,
+                        onRightClicked = onFinishClicked
+                    )
                 }
-            } else {
-                OutlinedButton(onClick = onPauseClicked) {
-                    Text("PAUSE")
+                BlockOfWork.State.RUNNING -> {
+                    TwoButtons(
+                        leftTitle = "PAUSE",
+                        rightTitle = "FINISH",
+                        onLeftClicked = onPauseClicked,
+                        onRightClicked = onFinishClicked
+                    )
                 }
-            }
-            OutlinedButton(onClick = onFinishClicked) {
-                Text("FINISH")
+                BlockOfWork.State.FINISHED -> {}
             }
         }
-        OutlinedButton(onClick = onBackClicked) {
+        OutlinedButton(
+            onClick = onBackClicked,
+            modifier = Modifier.padding(top = 20.dp)
+        ) {
             Text("BACK")
         }
     }
 }
 
+@Composable
+private fun BlockOfWorkItem(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = Modifier.fillMaxWidth(),
+        label = { Text(label) }
+    )
+}
+
+@Composable
+private fun DateTimeFields(
+    time: LocalDateTime,
+    dateLabel: String,
+    timeLabel: String
+) {
+    Row {
+        OutlinedTextField(
+            value = time.renderDate(),
+            onValueChange = { },
+            modifier = Modifier
+                .fillMaxWidth(0.5f)
+                .padding(end = 4.dp),
+            readOnly = true,
+            label = { Text(dateLabel) }
+        )
+        OutlinedTextField(
+            value = time.renderTime(),
+            onValueChange = { },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 4.dp),
+            readOnly = true,
+            label = { Text(timeLabel) }
+        )
+    }
+}
+
+@Composable
+private fun TwoButtons(
+    leftTitle: String,
+    rightTitle: String,
+    onLeftClicked: () -> Unit,
+    onRightClicked: () -> Unit
+) {
+    val textModifier = Modifier
+        .padding(top = 16.dp, bottom = 16.dp)
+    OutlinedButton(
+        modifier = Modifier
+            .fillMaxWidth(0.5f)
+            .padding(end = 4.dp),
+        onClick = onLeftClicked,
+    ) {
+        Text(
+            text = leftTitle,
+            modifier = textModifier
+        )
+    }
+    OutlinedButton(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 4.dp),
+        onClick = onRightClicked
+    ) {
+        Text(
+            text = rightTitle,
+            modifier = textModifier
+        )
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
-fun BlockOfWorkDetailedViewPreview() {
+fun FinishedBlockDetailedViewPreview() {
     TimeTrackerAppTheme {
         BlockOfWorkDetailedView(
             blockOfWork = BlockOfWork(
@@ -144,6 +202,33 @@ fun BlockOfWorkDetailedViewPreview() {
         )
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun RunningBlockDetailedViewPreview() {
+    TimeTrackerAppTheme {
+        BlockOfWorkDetailedView(
+            blockOfWork = BlockOfWork(
+                id = 0,
+                project = Project("my project"),
+                task = Task("my task"),
+                description = Description("my work"),
+                state = BlockOfWork.State.PAUSED,
+                intervals = testTimeIntervals()
+            ),
+            duration = Duration.minutes(50),
+            onProjectChanged = {},
+            onTaskChanged = {},
+            onDescriptionChanged = {},
+            onStartClicked = {},
+            onPauseClicked = {},
+            onResumeClicked = {},
+            onFinishClicked = {},
+            onBackClicked = {}
+        )
+    }
+}
+
 
 @Composable
 fun testTimeIntervals() = listOf(

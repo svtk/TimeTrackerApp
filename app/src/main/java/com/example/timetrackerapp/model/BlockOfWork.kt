@@ -109,12 +109,12 @@ fun Duration.renderDuration(state: BlockOfWork.State): String =
     else
         renderDurationLive()
 
-private fun Duration.renderDurationLive(): String =
+fun Duration.renderDurationLive(): String =
     toComponents { hours, minutes, seconds, _ ->
         renderTimeComponents(hours, minutes, seconds)
     }
 
-private fun Duration.renderDurationFinished(): String =
+fun Duration.renderDurationFinished(): String =
     toComponents { hours, minutes, seconds, _ ->
         if (hours == 0 && minutes == 0) "${seconds}s"
         else if (hours == 0) "${minutes}m"
