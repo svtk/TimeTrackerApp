@@ -70,7 +70,10 @@ fun BlockOfWorkCard(
                     Text(
                         modifier = Modifier.fillMaxWidth(0.5f),
                         style = MaterialTheme.typography.body1,
-                        text = "${blockOfWork.project.value}: ${blockOfWork.task.value}",
+                        text = if (blockOfWork.project.value.isNotEmpty())
+                            blockOfWork.project.value +
+                                    if (blockOfWork.task.value.isNotEmpty()) ": ${blockOfWork.task.value}" else ""
+                        else "(no project)",
                     )
                     Text(
                         modifier = Modifier.fillMaxWidth(),
