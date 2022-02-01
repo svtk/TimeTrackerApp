@@ -54,7 +54,7 @@ fun MainScreen() {
     }
     val onCurrentBlockFinished = {
         runningBlockOfWorkStore.onFinishClicked()
-        finishedBlocks += runningBlockOfWorkStore.blockOfWork!!
+        finishedBlocks = listOf(runningBlockOfWorkStore.blockOfWork!!) + finishedBlocks
         runningBlockOfWorkStore.clearTimeBlock()
         chosenBlockId = null
     }
