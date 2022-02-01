@@ -76,13 +76,13 @@ fun BlockOfWorkCard(
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.End,
                         style = MaterialTheme.typography.body1,
-                        text = duration.renderDuration(),
+                        text = duration.renderDuration(blockOfWork.state),
                     )
                 }
                 Row {
                     Text(
                         modifier = Modifier.fillMaxWidth(0.5f),
-                        style = MaterialTheme.typography.body2,
+                        style = MaterialTheme.typography.caption,
                         text = blockOfWork.description.value,
                     )
                     val finishTimeText =
@@ -93,7 +93,7 @@ fun BlockOfWorkCard(
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.End,
-                        style = MaterialTheme.typography.body2,
+                        style = MaterialTheme.typography.caption,
                         text = "${blockOfWork.startTime.renderTime()} - $finishTimeText",
                     )
                 }

@@ -96,12 +96,27 @@ private fun renderTimeComponents(hours: Int, minutes: Int, seconds: Int? = null)
 private fun renderTimeComponent(timeComponent: Int) = "%02d".format(timeComponent)
 
 fun LocalDateTime.renderDate(): String =
-    "${dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)}, $dayOfMonth ${month.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)}"
+    dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.ENGLISH) +
+            ", $dayOfMonth " +
+            month.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
 
 fun LocalDateTime.renderTime(): String =
     renderTimeComponents(hour, minute)
 
-fun Duration.renderDuration(): String =
+fun Duration.renderDuration(state: BlockOfWork.State): String =
+    if (state == BlockOfWork.State.FINISHED)
+        renderDurationFinished()
+    else
+        renderDurationLive()
+
+private fun Duration.renderDurationLive(): String =
     toComponents { hours, minutes, seconds, _ ->
         renderTimeComponents(hours, minutes, seconds)
+    }
+
+private fun Duration.renderDurationFinished(): String =
+    toComponents { hours, minutes, seconds, _ ->
+        if (hours == 0 && minutes == 0) "${seconds}s"
+        else if (hours == 0) "${minutes}m"
+        else "${hours}h ${minutes}m"
     }

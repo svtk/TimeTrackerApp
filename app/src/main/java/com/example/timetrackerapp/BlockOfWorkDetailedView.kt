@@ -58,33 +58,19 @@ fun BlockOfWorkDetailedView(
                 OutlinedTextField(
                     value = blockOfWork.startTime.renderTime(),
                     onValueChange = { },
-                    modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 8.dp),
                     readOnly = true,
                     label = { Text("Start time") }
                 )
             }
-            if (blockOfWork.state == BlockOfWork.State.FINISHED) {
-                Box {
-                    OutlinedTextField(
-                        value = "${duration.inWholeMinutes}",
-                        onValueChange = onTaskChanged,
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text("Duration") }
-                    )
-                    Text(
-                        text = "min",
-                        modifier = Modifier.align(Alignment.CenterEnd)
-                            .padding(end = 14.dp, top = 3.dp),
-                    )
-                }
-            } else {
-                OutlinedTextField(
-                    value = duration.renderDuration(),
-                    onValueChange = onTaskChanged,
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Duration") }
-                )
-            }
+            OutlinedTextField(
+                value = duration.renderDuration(blockOfWork.state),
+                onValueChange = onTaskChanged,
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Duration") }
+            )
             if (blockOfWork.state == BlockOfWork.State.FINISHED) {
                 Row {
                     OutlinedTextField(
@@ -97,7 +83,9 @@ fun BlockOfWorkDetailedView(
                     OutlinedTextField(
                         value = blockOfWork.finishTime.renderTime(),
                         onValueChange = { },
-                        modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 8.dp),
                         readOnly = true,
                         label = { Text("End time") }
                     )
