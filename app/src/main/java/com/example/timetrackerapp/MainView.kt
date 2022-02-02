@@ -20,28 +20,28 @@ fun MainView(
     duration: Duration?,
     finishedBlocks: List<BlockOfWork>,
     currentDescription: String,
-    onTextUpdate: (String) -> Unit,
+    onDescriptionUpdate: (String) -> Unit,
     onNewBlock: () -> Unit,
-    onCurrentBlockFinished: (id: Int) -> Unit,
     onCardClicked: (id: Int) -> Unit,
     onSimilarBlockStarted: (id: Int) -> Unit,
-    onCurrentBlockResumed: (id: Int) -> Unit,
+    onCurrentBlockResumed: () -> Unit,
+    onCurrentBlockFinished: () -> Unit,
 ) {
     Column {
         Box(modifier = Modifier.padding(8.dp)) {
             if (blockOfWork == null) {
                 StartingNewBlock(
-                    text = currentDescription,
-                    onTextUpdate = onTextUpdate,
-                    onNewTask = onNewBlock
+                    description = currentDescription,
+                    onDescriptionUpdate = onDescriptionUpdate,
+                    onNewBlock = onNewBlock
                 )
             } else {
                 BlockOfWorkCard(
                     blockOfWork = blockOfWork,
                     duration = duration ?: blockOfWork.duration,
                     onCardClicked = onCardClicked,
-                    onStartClicked = onCurrentBlockResumed,
-                    onFinishClicked = onCurrentBlockFinished,
+                    onStartClicked = { onCurrentBlockResumed() },
+                    onFinishClicked = { onCurrentBlockFinished() },
                 )
             }
         }
@@ -55,9 +55,9 @@ fun MainView(
 
 @Composable
 fun StartingNewBlock(
-    text: String,
-    onTextUpdate: (String) -> Unit,
-    onNewTask: () -> Unit
+    description: String,
+    onDescriptionUpdate: (String) -> Unit,
+    onNewBlock: () -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -65,12 +65,12 @@ fun StartingNewBlock(
     ) {
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(0.8f),
-            value = text,
-            onValueChange = { onTextUpdate(it) },
+            value = description,
+            onValueChange = { onDescriptionUpdate(it) },
             label = { Text("I'm working on...") },
         )
         IconButton(
-            onClick = onNewTask,
+            onClick = onNewBlock,
             modifier = Modifier.fillMaxWidth(),
         ) {
             Icon(
@@ -98,13 +98,12 @@ fun MainScreenRunningTaskPreview() {
             duration = null,
             finishedBlocks = testTimeBlocks(),
             currentDescription = "",
-            onTextUpdate = {},
+            onDescriptionUpdate = {},
             onNewBlock = {},
-            onCurrentBlockFinished = {},
             onCardClicked = {},
-            onCurrentBlockResumed = {},
             onSimilarBlockStarted = {},
-        )
+            onCurrentBlockResumed = {},
+        ) {}
     }
 }
 
@@ -117,12 +116,11 @@ fun MainScreenChoosingTaskPreview() {
             duration = null,
             finishedBlocks = testTimeBlocks(),
             currentDescription = "",
-            onTextUpdate = {},
+            onDescriptionUpdate = {},
             onNewBlock = {},
-            onCurrentBlockFinished = {},
             onCardClicked = {},
-            onCurrentBlockResumed = {},
             onSimilarBlockStarted = {},
-        )
+            onCurrentBlockResumed = {},
+        ) {}
     }
 }

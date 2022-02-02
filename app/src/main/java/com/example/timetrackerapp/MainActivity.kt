@@ -33,9 +33,17 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     var chosenBlockId by remember { mutableStateOf<Int?>(null) }
+    fun updateChosenBlock(id: Int?) {
+        chosenBlockId = id
+    }
+
     var currentDescription by remember { mutableStateOf("") }
+    fun updateDescription(newText: String) {
+        currentDescription = newText
+    }
 
     var finishedBlocks by remember { mutableStateOf(listOf<BlockOfWork>()) }
+    fun findFinishedBlockById(id: Int?) = finishedBlocks.find { it.id == id }
 
     val coroutineScope = rememberCoroutineScope()
     val runningBlockOfWorkStore = remember {
@@ -45,15 +53,12 @@ fun MainScreen() {
         )
     }
 
-    val onTextUpdate = { newText: String -> currentDescription = newText }
-    val onCardClicked = { id: Int ->
-        chosenBlockId = id
-    }
     fun startNewBlock(description: String, project: Project, task: Task) {
         val id = runningBlockOfWorkStore.startNewTimeBlock(description, project, task)
-        currentDescription = ""
-        chosenBlockId = id
+        updateChosenBlock(id)
+        updateDescription("")
     }
+
     fun finishCurrentBlock() {
         runningBlockOfWorkStore.onFinishClicked()
         finishedBlocks =
@@ -61,58 +66,60 @@ fun MainScreen() {
                 listOf(currentBlock) + finishedBlocks
             } ?: finishedBlocks
         runningBlockOfWorkStore.clearTimeBlock()
-        chosenBlockId = null
+        updateChosenBlock(null)
     }
+
     fun startSimilarBlock(id: Int) {
         finishCurrentBlock()
-        val originalBlock = finishedBlocks.first { it.id == id }
+        val originalBlock = findFinishedBlockById(id) ?: return
         startNewBlock(originalBlock.description.value, originalBlock.project, originalBlock.task)
     }
 
-    if (chosenBlockId == null) {
-        MainView(
-            blockOfWork = runningBlockOfWorkStore.blockOfWork,
-            duration = if (runningBlockOfWorkStore.blockOfWork != null)
-                runningBlockOfWorkStore.getCurrentDuration().value
-            else
-                null,
-            finishedBlocks = finishedBlocks,
-            currentDescription = currentDescription,
-            onTextUpdate = onTextUpdate,
-            onNewBlock = { startNewBlock(currentDescription, Project(""), Task("")) },
-            onCurrentBlockFinished = { finishCurrentBlock() },
-            onCardClicked = onCardClicked,
-            onSimilarBlockStarted = { id -> startSimilarBlock(id) },
-            onCurrentBlockResumed = { runningBlockOfWorkStore.onResumeClicked() },
+    val runningBlock = runningBlockOfWorkStore.blockOfWork
+    if (runningBlock != null && chosenBlockId == runningBlock.id) {
+        BlockOfWorkDetailedView(
+            blockOfWork = runningBlock,
+            duration = runningBlockOfWorkStore.getCurrentDuration().value,
+            onProjectChanged = runningBlockOfWorkStore::onProjectChanged,
+            onTaskChanged = runningBlockOfWorkStore::onTaskChanged,
+            onDescriptionChanged = runningBlockOfWorkStore::onDescriptionChanged,
+            onStartClicked = runningBlockOfWorkStore::onStartClicked,
+            onPauseClicked = runningBlockOfWorkStore::onPauseClicked,
+            onResumeClicked = runningBlockOfWorkStore::onResumeClicked,
+            onFinishClicked = ::finishCurrentBlock,
+            onBackClicked = { updateChosenBlock(null) }
         )
-    } else {
-        if (chosenBlockId == runningBlockOfWorkStore.blockOfWork?.id) {
-            BlockOfWorkDetailedView(
-                blockOfWork = runningBlockOfWorkStore.blockOfWork!!,
-                duration = runningBlockOfWorkStore.getCurrentDuration().value,
-                onProjectChanged = runningBlockOfWorkStore::onProjectChanged,
-                onTaskChanged = runningBlockOfWorkStore::onTaskChanged,
-                onDescriptionChanged = runningBlockOfWorkStore::onDescriptionChanged,
-                onStartClicked = runningBlockOfWorkStore::onStartClicked,
-                onPauseClicked = runningBlockOfWorkStore::onPauseClicked,
-                onResumeClicked = runningBlockOfWorkStore::onResumeClicked,
-                onFinishClicked = ::finishCurrentBlock,
-                onBackClicked = { chosenBlockId = null }
-            )
-        } else {
-            val block = finishedBlocks.first { it.id == chosenBlockId }
-            BlockOfWorkDetailedView(
-                blockOfWork = block,
-                duration = block.duration,
-                onProjectChanged = {},
-                onTaskChanged = {},
-                onDescriptionChanged = {},
-                onStartClicked = {},
-                onPauseClicked = {},
-                onResumeClicked = {},
-                onFinishClicked = {},
-                onBackClicked = { chosenBlockId = null }
-            )
-        }
+        return
     }
+    val chosenFinishedBlock = findFinishedBlockById(chosenBlockId)
+    if (chosenFinishedBlock != null) {
+        BlockOfWorkDetailedView(
+            blockOfWork = chosenFinishedBlock,
+            duration = chosenFinishedBlock.duration,
+            onProjectChanged = {},
+            onTaskChanged = {},
+            onDescriptionChanged = {},
+            onStartClicked = {},
+            onPauseClicked = {},
+            onResumeClicked = {},
+            onFinishClicked = {},
+            onBackClicked = { updateChosenBlock(null) }
+        )
+        return
+    }
+    MainView(
+        blockOfWork = runningBlock,
+        duration = if (runningBlock != null)
+            runningBlockOfWorkStore.getCurrentDuration().value
+        else
+            null,
+        finishedBlocks = finishedBlocks,
+        currentDescription = currentDescription,
+        onDescriptionUpdate = ::updateDescription,
+        onNewBlock = { startNewBlock(currentDescription, Project(""), Task("")) },
+        onCardClicked = ::updateChosenBlock,
+        onSimilarBlockStarted = { id -> startSimilarBlock(id) },
+        onCurrentBlockResumed = runningBlockOfWorkStore::onResumeClicked,
+        onCurrentBlockFinished = ::finishCurrentBlock,
+    )
 }
