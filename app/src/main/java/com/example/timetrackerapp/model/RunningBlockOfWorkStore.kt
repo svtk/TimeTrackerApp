@@ -20,7 +20,7 @@ class RunningBlockOfWorkStore(
     @Composable
     fun getCurrentDuration(): State<Duration> = ticker
         .tickFlow
-        .map { blockOfWork!!.duration }
+        .map { blockOfWork?.duration ?: Duration.ZERO }
         .distinctUntilChanged()
         .collectAsState(Duration.ZERO)
 
@@ -28,20 +28,25 @@ class RunningBlockOfWorkStore(
         blockOfWork = null
     }
 
-    fun startNewTimeBlock(description: String): Int {
+    fun startNewTimeBlock(
+        description: String,
+        project: Project,
+        task: Task,
+    ): Int {
+        val id = nextId()
         blockOfWork = BlockOfWork(
-            nextId(),
-            Project(""),
-            Task(""),
+            id,
+            project,
+            task,
             Description(description),
             BlockOfWork.State.RUNNING,
             listOf(OpenTimeInterval())
         )
-        return blockOfWork!!.id
+        return id
     }
 
     private inline fun setState(update: BlockOfWork.() -> BlockOfWork) {
-        blockOfWork = blockOfWork!!.update()
+        blockOfWork = blockOfWork?.update()
     }
 
     fun onProjectChanged(projectName: String) {

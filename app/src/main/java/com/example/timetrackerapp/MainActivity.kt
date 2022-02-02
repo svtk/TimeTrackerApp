@@ -6,7 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import com.example.timetrackerapp.model.BlockOfWork
+import com.example.timetrackerapp.model.Project
 import com.example.timetrackerapp.model.RunningBlockOfWorkStore
+import com.example.timetrackerapp.model.Task
 import com.example.timetrackerapp.ui.theme.TimeTrackerAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -47,34 +49,41 @@ fun MainScreen() {
     val onCardClicked = { id: Int ->
         chosenBlockId = id
     }
-    val onNewBlock = {
-        val id = runningBlockOfWorkStore.startNewTimeBlock(currentDescription)
+    fun startNewBlock(description: String, project: Project, task: Task) {
+        val id = runningBlockOfWorkStore.startNewTimeBlock(description, project, task)
         currentDescription = ""
         chosenBlockId = id
     }
-    val onCurrentBlockFinished = {
+    fun finishCurrentBlock() {
         runningBlockOfWorkStore.onFinishClicked()
-        finishedBlocks = listOf(runningBlockOfWorkStore.blockOfWork!!) + finishedBlocks
+        finishedBlocks =
+            runningBlockOfWorkStore.blockOfWork?.let { currentBlock ->
+                listOf(currentBlock) + finishedBlocks
+            } ?: finishedBlocks
         runningBlockOfWorkStore.clearTimeBlock()
         chosenBlockId = null
+    }
+    fun startSimilarBlock(id: Int) {
+        finishCurrentBlock()
+        val originalBlock = finishedBlocks.first { it.id == id }
+        startNewBlock(originalBlock.description.value, originalBlock.project, originalBlock.task)
     }
 
     if (chosenBlockId == null) {
         MainView(
-            runningBlockOfWorkStore.blockOfWork,
-            if (runningBlockOfWorkStore.blockOfWork != null)
+            blockOfWork = runningBlockOfWorkStore.blockOfWork,
+            duration = if (runningBlockOfWorkStore.blockOfWork != null)
                 runningBlockOfWorkStore.getCurrentDuration().value
             else
                 null,
-            finishedBlocks,
-            currentDescription,
-            onTextUpdate,
-            onNewBlock,
-            onCurrentBlockFinished,
-            onCardClicked,
-            runningBlockOfWorkStore::onStartClicked,
-            runningBlockOfWorkStore::onPauseClicked,
-            runningBlockOfWorkStore::onResumeClicked,
+            finishedBlocks = finishedBlocks,
+            currentDescription = currentDescription,
+            onTextUpdate = onTextUpdate,
+            onNewBlock = { startNewBlock(currentDescription, Project(""), Task("")) },
+            onCurrentBlockFinished = { finishCurrentBlock() },
+            onCardClicked = onCardClicked,
+            onSimilarBlockStarted = { id -> startSimilarBlock(id) },
+            onCurrentBlockResumed = { runningBlockOfWorkStore.onResumeClicked() },
         )
     } else {
         if (chosenBlockId == runningBlockOfWorkStore.blockOfWork?.id) {
@@ -87,7 +96,7 @@ fun MainScreen() {
                 onStartClicked = runningBlockOfWorkStore::onStartClicked,
                 onPauseClicked = runningBlockOfWorkStore::onPauseClicked,
                 onResumeClicked = runningBlockOfWorkStore::onResumeClicked,
-                onFinishClicked = onCurrentBlockFinished,
+                onFinishClicked = ::finishCurrentBlock,
                 onBackClicked = { chosenBlockId = null }
             )
         } else {

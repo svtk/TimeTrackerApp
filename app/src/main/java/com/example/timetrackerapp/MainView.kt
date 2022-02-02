@@ -21,12 +21,11 @@ fun MainView(
     finishedBlocks: List<BlockOfWork>,
     currentDescription: String,
     onTextUpdate: (String) -> Unit,
-    onNewTask: () -> Unit,
-    onCurrentBlockFinished: () -> Unit,
+    onNewBlock: () -> Unit,
+    onCurrentBlockFinished: (id: Int) -> Unit,
     onCardClicked: (id: Int) -> Unit,
-    onStartClicked: () -> Unit,
-    onPauseClicked: () -> Unit,
-    onResumeClicked: () -> Unit,
+    onSimilarBlockStarted: (id: Int) -> Unit,
+    onCurrentBlockResumed: (id: Int) -> Unit,
 ) {
     Column {
         Box(modifier = Modifier.padding(8.dp)) {
@@ -34,23 +33,22 @@ fun MainView(
                 StartingNewBlock(
                     text = currentDescription,
                     onTextUpdate = onTextUpdate,
-                    onNewTask = onNewTask
+                    onNewTask = onNewBlock
                 )
             } else {
                 BlockOfWorkCard(
                     blockOfWork = blockOfWork,
                     duration = duration ?: blockOfWork.duration,
-                    onCardClicked = { onCardClicked(blockOfWork.id) },
-                    onStartClicked = onStartClicked,
-                    onPauseClicked = onPauseClicked,
-                    onResumeClicked = onResumeClicked,
+                    onCardClicked = onCardClicked,
+                    onStartClicked = onCurrentBlockResumed,
                     onFinishClicked = onCurrentBlockFinished,
                 )
             }
         }
         BlockOfWorkListContent(
             blocks = finishedBlocks,
-            onBlockClicked = { id -> onCardClicked(id) }
+            onCardClicked = onCardClicked,
+            onSimilarBlockStarted = onSimilarBlockStarted,
         )
     }
 }
@@ -101,12 +99,11 @@ fun MainScreenRunningTaskPreview() {
             finishedBlocks = testTimeBlocks(),
             currentDescription = "",
             onTextUpdate = {},
-            onNewTask = {},
+            onNewBlock = {},
             onCurrentBlockFinished = {},
             onCardClicked = {},
-            onStartClicked = {},
-            onPauseClicked = {},
-            onResumeClicked = {},
+            onCurrentBlockResumed = {},
+            onSimilarBlockStarted = {},
         )
     }
 }
@@ -121,12 +118,11 @@ fun MainScreenChoosingTaskPreview() {
             finishedBlocks = testTimeBlocks(),
             currentDescription = "",
             onTextUpdate = {},
-            onNewTask = {},
+            onNewBlock = {},
             onCurrentBlockFinished = {},
             onCardClicked = {},
-            onStartClicked = {},
-            onPauseClicked = {},
-            onResumeClicked = {},
+            onCurrentBlockResumed = {},
+            onSimilarBlockStarted = {},
         )
     }
 }

@@ -28,17 +28,16 @@ import kotlin.time.Duration
 @Composable
 fun BlockOfWorkListContent(
     blocks: List<BlockOfWork>,
-    onBlockClicked: (id: Int) -> Unit
+    onCardClicked: (id: Int) -> Unit,
+    onSimilarBlockStarted: (id: Int) -> Unit,
 ) {
     LazyColumn(modifier = Modifier.padding(8.dp)) {
         items(blocks) { block ->
             BlockOfWorkCard(
                 blockOfWork = block,
                 duration = block.duration,
-                onCardClicked = onBlockClicked,
-                onStartClicked = { },
-                onPauseClicked = { },
-                onResumeClicked = { },
+                onCardClicked = onCardClicked,
+                onStartClicked = onSimilarBlockStarted,
                 onFinishClicked = { },
             )
         }
@@ -50,10 +49,8 @@ fun BlockOfWorkCard(
     blockOfWork: BlockOfWork,
     duration: Duration,
     onCardClicked: (id: Int) -> Unit,
-    onStartClicked: () -> Unit,
-    onPauseClicked: () -> Unit,
-    onResumeClicked: () -> Unit,
-    onFinishClicked: () -> Unit,
+    onStartClicked: (id: Int) -> Unit,
+    onFinishClicked: (id: Int) -> Unit,
 ) {
     Card(
         modifier = Modifier.padding(4.dp),
@@ -108,7 +105,7 @@ fun BlockOfWorkCard(
             }
             when (blockOfWork.state) {
                 BlockOfWork.State.RUNNING -> {
-                    IconButton(onClick = onFinishClicked) {
+                    IconButton(onClick = { onFinishClicked(blockOfWork.id) }) {
                         Icon(
                             imageVector = Icons.Filled.StopCircle,
                             contentDescription = "Finish",
@@ -116,15 +113,16 @@ fun BlockOfWorkCard(
                     }
                 }
                 BlockOfWork.State.PAUSED -> {
-                    IconButton(onClick = onResumeClicked) {
+                    IconButton(onClick = { onStartClicked(blockOfWork.id) }) {
                         Icon(
                             imageVector = Icons.Filled.PlayCircle,
                             contentDescription = "Resume",
                         )
                     }
                 }
-                else -> {
-                    IconButton(onClick = onResumeClicked) {
+                BlockOfWork.State.CREATED -> {}
+                BlockOfWork.State.FINISHED -> {
+                    IconButton(onClick = { onStartClicked(blockOfWork.id) }) {
                         Icon(
                             imageVector = Icons.Filled.PlayCircle,
                             contentDescription = "Start",
@@ -143,7 +141,8 @@ fun BlockOfWorkListPreview() {
     TimeTrackerAppTheme {
         BlockOfWorkListContent(
             blocks = testTimeBlocks(),
-            onBlockClicked = {}
+            onCardClicked = {},
+            onSimilarBlockStarted = {},
         )
     }
 }
