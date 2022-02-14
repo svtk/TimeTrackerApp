@@ -1,21 +1,32 @@
 package com.example.timetrackerapp.model
 
-
 import androidx.compose.runtime.*
-import kotlinx.coroutines.CoroutineScope
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.example.timetrackerapp.data.BlocksOfWorkRepository
+import com.example.timetrackerapp.ui.FinishedBlocksViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlin.time.Duration
 
-class RunningBlockOfWorkStore(
-    coroutineScope: CoroutineScope,
-    private val nextId: () -> Int
-) {
+class RunningBlockViewModel(
+    private val repository: BlocksOfWorkRepository
+) : ViewModel() {
+
+    var currentDescription by mutableStateOf("")
+        private set
+
     var blockOfWork: BlockOfWork? by mutableStateOf(null)
         private set
 
     // TODO should we pause ticker while there's no running time block?
-    private val ticker = TickHandler(coroutineScope)
+    private val ticker = TickHandler(viewModelScope)
+
+    fun updateDescription(newText: String) {
+        currentDescription = newText
+    }
 
     @Composable
     fun getCurrentDuration(): State<Duration> = ticker
@@ -24,29 +35,32 @@ class RunningBlockOfWorkStore(
         .distinctUntilChanged()
         .collectAsState(Duration.ZERO)
 
-    fun clearTimeBlock() {
-        blockOfWork = null
-    }
-
     fun startNewTimeBlock(
         description: String,
         project: Project,
         task: Task,
     ): Int {
-        val id = nextId()
         blockOfWork = BlockOfWork(
-            id,
+            id = 0,
             project,
             task,
             Description(description),
             BlockOfWork.State.RUNNING,
             listOf(OpenTimeInterval())
         )
-        return id
+        viewModelScope.launch {
+            repository.updateRunningBlock(blockOfWork!!)
+        }
+        return 0
     }
 
     private inline fun setState(update: BlockOfWork.() -> BlockOfWork) {
         blockOfWork = blockOfWork?.update()
+        blockOfWork?.let {
+            viewModelScope.launch {
+                repository.updateRunningBlock(it)
+            }
+        }
     }
 
     fun onProjectChanged(projectName: String) {
@@ -94,6 +108,23 @@ class RunningBlockOfWorkStore(
                 state = BlockOfWork.State.FINISHED,
                 intervals = intervals.closeLast(),
             )
+        }
+        blockOfWork = null
+        viewModelScope.launch {
+            repository.finishRunningBlock()
+        }
+    }
+
+    companion object {
+        fun provideFactory(
+            repository: BlocksOfWorkRepository
+        ): ViewModelProvider.Factory {
+            return object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                    return RunningBlockViewModel(repository) as T
+                }
+            }
         }
     }
 }

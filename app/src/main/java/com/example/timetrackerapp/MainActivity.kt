@@ -3,17 +3,28 @@ package com.example.timetrackerapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import com.example.timetrackerapp.model.BlockOfWork
+import com.example.timetrackerapp.data.FakeBlocksOfWorkRepository
 import com.example.timetrackerapp.model.Project
-import com.example.timetrackerapp.model.RunningBlockOfWorkStore
+import com.example.timetrackerapp.model.RunningBlockViewModel
 import com.example.timetrackerapp.model.Task
+import com.example.timetrackerapp.ui.FinishedBlocksViewModel
 import com.example.timetrackerapp.ui.theme.TimeTrackerAppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // TODO use dependency injection
+        val repository = FakeBlocksOfWorkRepository()
+
+        val runningBlockViewModel: RunningBlockViewModel by
+            viewModels(factoryProducer = { RunningBlockViewModel.provideFactory(repository) })
+        val finishedBlocksViewModel: FinishedBlocksViewModel by
+            viewModels(factoryProducer = { FinishedBlocksViewModel.provideFactory(repository) })
+
         setContent {
             TimeTrackerAppTheme {
                 Scaffold(
@@ -22,7 +33,10 @@ class MainActivity : ComponentActivity() {
                     },
                 ) {
                     Surface(color = MaterialTheme.colors.background) {
-                        MainScreen()
+                        MainScreen(
+                            runningBlockViewModel,
+                            finishedBlocksViewModel,
+                        )
                     }
                 }
             }
@@ -31,67 +45,47 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreen() {
-    var chosenBlockId by remember { mutableStateOf<Int?>(null) }
-    fun updateChosenBlock(id: Int?) {
-        chosenBlockId = id
-    }
-
-    var currentDescription by remember { mutableStateOf("") }
-    fun updateDescription(newText: String) {
-        currentDescription = newText
-    }
-
-    var finishedBlocks by remember { mutableStateOf(listOf<BlockOfWork>()) }
+fun MainScreen(
+    runningBlockViewModel: RunningBlockViewModel,
+    finishedBlocksViewModel: FinishedBlocksViewModel,
+) {
+    val finishedBlocks by finishedBlocksViewModel.finishedBlocks.collectAsState(listOf())
     fun findFinishedBlockById(id: Int?) = finishedBlocks.find { it.id == id }
 
-    val coroutineScope = rememberCoroutineScope()
-    val runningBlockOfWorkStore = remember {
-        RunningBlockOfWorkStore(
-            coroutineScope,
-            nextId = { (finishedBlocks.maxOfOrNull { it.id } ?: 0) + 1 }
-        )
-    }
-
     fun startNewBlock(description: String, project: Project, task: Task) {
-        val id = runningBlockOfWorkStore.startNewTimeBlock(description, project, task)
-        updateChosenBlock(id)
-        updateDescription("")
+        val id = runningBlockViewModel.startNewTimeBlock(description, project, task)
+        runningBlockViewModel.updateDescription("")
+        finishedBlocksViewModel.updateChosenBlock(id)
     }
 
-    fun finishCurrentBlock() {
-        runningBlockOfWorkStore.onFinishClicked()
-        finishedBlocks =
-            runningBlockOfWorkStore.blockOfWork?.let { currentBlock ->
-                listOf(currentBlock) + finishedBlocks
-            } ?: finishedBlocks
-        runningBlockOfWorkStore.clearTimeBlock()
-        updateChosenBlock(null)
+    fun finishRunningBlock() {
+        runningBlockViewModel.onFinishClicked()
+        finishedBlocksViewModel.updateChosenBlock(id = null)
     }
 
     fun startSimilarBlock(id: Int) {
-        finishCurrentBlock()
+        finishRunningBlock()
         val originalBlock = findFinishedBlockById(id) ?: return
         startNewBlock(originalBlock.description.value, originalBlock.project, originalBlock.task)
     }
 
-    val runningBlock = runningBlockOfWorkStore.blockOfWork
-    if (runningBlock != null && chosenBlockId == runningBlock.id) {
+    val runningBlock = runningBlockViewModel.blockOfWork
+    if (runningBlock != null && finishedBlocksViewModel.chosenBlockId == runningBlock.id) {
         BlockOfWorkDetailedView(
             blockOfWork = runningBlock,
-            duration = runningBlockOfWorkStore.getCurrentDuration().value,
-            onProjectChanged = runningBlockOfWorkStore::onProjectChanged,
-            onTaskChanged = runningBlockOfWorkStore::onTaskChanged,
-            onDescriptionChanged = runningBlockOfWorkStore::onDescriptionChanged,
-            onStartClicked = runningBlockOfWorkStore::onStartClicked,
-            onPauseClicked = runningBlockOfWorkStore::onPauseClicked,
-            onResumeClicked = runningBlockOfWorkStore::onResumeClicked,
-            onFinishClicked = ::finishCurrentBlock,
-            onBackClicked = { updateChosenBlock(null) }
+            duration = runningBlockViewModel.getCurrentDuration().value,
+            onProjectChanged = runningBlockViewModel::onProjectChanged,
+            onTaskChanged = runningBlockViewModel::onTaskChanged,
+            onDescriptionChanged = runningBlockViewModel::onDescriptionChanged,
+            onStartClicked = runningBlockViewModel::onStartClicked,
+            onPauseClicked = runningBlockViewModel::onPauseClicked,
+            onResumeClicked = runningBlockViewModel::onResumeClicked,
+            onFinishClicked = ::finishRunningBlock,
+            onBackClicked = { finishedBlocksViewModel.updateChosenBlock(null) }
         )
         return
     }
-    val chosenFinishedBlock = findFinishedBlockById(chosenBlockId)
+    val chosenFinishedBlock = findFinishedBlockById(finishedBlocksViewModel.chosenBlockId)
     if (chosenFinishedBlock != null) {
         BlockOfWorkDetailedView(
             blockOfWork = chosenFinishedBlock,
@@ -103,23 +97,23 @@ fun MainScreen() {
             onPauseClicked = {},
             onResumeClicked = {},
             onFinishClicked = {},
-            onBackClicked = { updateChosenBlock(null) }
+            onBackClicked = { finishedBlocksViewModel.updateChosenBlock(null) }
         )
         return
     }
     MainView(
         blockOfWork = runningBlock,
         duration = if (runningBlock != null)
-            runningBlockOfWorkStore.getCurrentDuration().value
+            runningBlockViewModel.getCurrentDuration().value
         else
             null,
         finishedBlocks = finishedBlocks,
-        currentDescription = currentDescription,
-        onDescriptionUpdate = ::updateDescription,
-        onNewBlock = { startNewBlock(currentDescription, Project(""), Task("")) },
-        onCardClicked = ::updateChosenBlock,
+        currentDescription = runningBlockViewModel.currentDescription,
+        onDescriptionUpdate = runningBlockViewModel::updateDescription,
+        onNewBlock = { startNewBlock(runningBlockViewModel.currentDescription, Project(""), Task("")) },
+        onCardClicked = finishedBlocksViewModel::updateChosenBlock,
         onSimilarBlockStarted = { id -> startSimilarBlock(id) },
-        onCurrentBlockResumed = runningBlockOfWorkStore::onResumeClicked,
-        onCurrentBlockFinished = ::finishCurrentBlock,
+        onCurrentBlockResumed = runningBlockViewModel::onResumeClicked,
+        onCurrentBlockFinished = ::finishRunningBlock,
     )
 }
