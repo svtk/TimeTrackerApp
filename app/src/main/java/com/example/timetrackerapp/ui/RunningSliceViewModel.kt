@@ -75,15 +75,6 @@ class RunningSliceViewModel(
         setState { copy(description = Description(description)) }
     }
 
-    fun onStartClicked() {
-        setState {
-            copy(
-                state = WorkSlice.State.RUNNING,
-                intervals = listOf(OpenTimeInterval()),
-            )
-        }
-    }
-
     fun onPauseClicked() {
         setState {
             copy(

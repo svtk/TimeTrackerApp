@@ -25,7 +25,6 @@ fun SliceDetailedView(
     onProjectChanged: (String) -> Unit,
     onTaskChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
-    onStartClicked: () -> Unit,
     onPauseClicked: () -> Unit,
     onResumeClicked: () -> Unit,
     onFinishClicked: () -> Unit,
@@ -41,39 +40,32 @@ fun SliceDetailedView(
         SliceItem(
             "Task", slice.task.value, onTaskChanged
         )
-        if (slice.state != WorkSlice.State.CREATED) {
-            DateTimeFields(
-                slice.startTime, "Start date", "Start time"
+        DateTimeFields(
+            slice.startTime, "Start date", "Start time"
+        )
+        if (slice.state == WorkSlice.State.FINISHED) {
+            SliceItem(
+                "Duration", duration.renderDurationFinished(), {}
             )
-            if (slice.state == WorkSlice.State.FINISHED) {
-                SliceItem(
-                    "Duration", duration.renderDurationFinished(), {}
-                )
-            } else {
-                Text(
-                    text = duration.renderDurationLive(),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 20.dp, bottom = 20.dp),
-                    style = MaterialTheme.typography.h4.copy(fontWeight = FontWeight.Bold),
-                )
-            }
-            if (slice.state == WorkSlice.State.FINISHED) {
-                DateTimeFields(
-                    slice.finishTime, "End date", "End time"
-                )
-            }
+        } else {
+            Text(
+                text = duration.renderDurationLive(),
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp, bottom = 20.dp),
+                style = MaterialTheme.typography.h4.copy(fontWeight = FontWeight.Bold),
+            )
+        }
+        if (slice.state == WorkSlice.State.FINISHED) {
+            DateTimeFields(
+                slice.finishTime, "End date", "End time"
+            )
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             when (slice.state) {
-                WorkSlice.State.CREATED -> {
-                    OutlinedButton(onClick = onStartClicked) {
-                        Text("START")
-                    }
-                }
                 WorkSlice.State.PAUSED -> {
                     TwoButtons(
                         leftTitle = "RESUME",
@@ -194,7 +186,6 @@ fun FinishedSliceDetailedViewPreview() {
             onProjectChanged = {},
             onTaskChanged = {},
             onDescriptionChanged = {},
-            onStartClicked = {},
             onPauseClicked = {},
             onResumeClicked = {},
             onFinishClicked = {},
@@ -220,7 +211,6 @@ fun RunningSliceDetailedViewPreview() {
             onProjectChanged = {},
             onTaskChanged = {},
             onDescriptionChanged = {},
-            onStartClicked = {},
             onPauseClicked = {},
             onResumeClicked = {},
             onFinishClicked = {},

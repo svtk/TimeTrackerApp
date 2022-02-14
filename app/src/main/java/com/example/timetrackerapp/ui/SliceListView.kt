@@ -120,7 +120,6 @@ fun SliceCard(
                         )
                     }
                 }
-                WorkSlice.State.CREATED -> {}
                 WorkSlice.State.FINISHED -> {
                     IconButton(onClick = { onStartClicked(slice.id) }) {
                         Icon(
@@ -160,21 +159,21 @@ fun createTestSlices() = listOf(
         project = Project("project 1"),
         task = Task("task 1"),
         description = Description("short description"),
+        state = WorkSlice.State.FINISHED,
         intervals = listOf(
             testTimeInterval("2022-01-05T10:00", Duration.minutes(10)),
             testTimeInterval("2022-01-05T10:20", Duration.minutes(15)),
         ),
-        state = WorkSlice.State.FINISHED,
     ),
     WorkSlice(
         id = 1,
         project = Project("project 2 - very long title"),
         task = Task("task 2 - also long"),
         description = Description("very long second description"),
+        state = WorkSlice.State.FINISHED,
         intervals = listOf(
             testTimeInterval("2022-01-26T11:30", Duration.minutes(20)),
             testTimeInterval("2022-01-26T13:00", Duration.minutes(30)),
         ),
-        state = WorkSlice.State.FINISHED,
     ),
 )

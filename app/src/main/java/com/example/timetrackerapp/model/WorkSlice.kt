@@ -15,18 +15,18 @@ data class WorkSlice(
     val intervals: List<TimeInterval>,
 ) {
     enum class State {
-        CREATED, RUNNING, PAUSED, FINISHED
+        RUNNING, PAUSED, FINISHED
     }
 
-    private fun List<TimeInterval>.checkNonEmpty() = this.also {
-        if (isEmpty()) throw IllegalStateException("Current slice is not started")
+    init {
+        check(intervals.isNotEmpty())
     }
 
     val startTime: LocalDateTime
-        get() = intervals.checkNonEmpty().startTime()
+        get() = intervals.startTime()
 
     val finishTime: LocalDateTime
-        get() = intervals.checkNonEmpty().last().finishTime
+        get() = intervals.last().finishTime
 
     val duration: Duration
         get() = intervals.countDuration()
