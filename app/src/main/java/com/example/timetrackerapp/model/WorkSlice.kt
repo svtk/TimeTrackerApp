@@ -6,7 +6,7 @@ import java.time.format.TextStyle
 import java.util.*
 import kotlin.time.Duration
 
-data class BlockOfWork(
+data class WorkSlice(
     val id: Int,
     val project: Project,
     val task: Task,
@@ -19,7 +19,7 @@ data class BlockOfWork(
     }
 
     private fun List<TimeInterval>.checkNonEmpty() = this.also {
-        if (isEmpty()) throw IllegalStateException("Current time block is not started")
+        if (isEmpty()) throw IllegalStateException("Current slice is not started")
     }
 
     val startTime: LocalDateTime
@@ -103,8 +103,8 @@ fun LocalDateTime.renderDate(): String =
 fun LocalDateTime.renderTime(): String =
     renderTimeComponents(hour, minute)
 
-fun Duration.renderDuration(state: BlockOfWork.State): String =
-    if (state == BlockOfWork.State.FINISHED)
+fun Duration.renderDuration(state: WorkSlice.State): String =
+    if (state == WorkSlice.State.FINISHED)
         renderDurationFinished()
     else
         renderDurationLive()

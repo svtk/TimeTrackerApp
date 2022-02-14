@@ -1,4 +1,4 @@
-package com.example.timetrackerapp
+package com.example.timetrackerapp.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
@@ -19,8 +19,8 @@ import kotlinx.datetime.LocalDateTime
 import kotlin.time.Duration
 
 @Composable
-fun BlockOfWorkDetailedView(
-    blockOfWork: BlockOfWork,
+fun SliceDetailedView(
+    slice: WorkSlice,
     duration: Duration,
     onProjectChanged: (String) -> Unit,
     onTaskChanged: (String) -> Unit,
@@ -32,21 +32,21 @@ fun BlockOfWorkDetailedView(
     onBackClicked: () -> Unit,
 ) {
     Column(Modifier.padding(8.dp)) {
-        BlockOfWorkItem(
-            "Description", blockOfWork.description.value, onDescriptionChanged
+        SliceItem(
+            "Description", slice.description.value, onDescriptionChanged
         )
-        BlockOfWorkItem(
-            "Project", blockOfWork.project.value, onProjectChanged
+        SliceItem(
+            "Project", slice.project.value, onProjectChanged
         )
-        BlockOfWorkItem(
-            "Task", blockOfWork.task.value, onTaskChanged
+        SliceItem(
+            "Task", slice.task.value, onTaskChanged
         )
-        if (blockOfWork.state != BlockOfWork.State.CREATED) {
+        if (slice.state != WorkSlice.State.CREATED) {
             DateTimeFields(
-                blockOfWork.startTime, "Start date", "Start time"
+                slice.startTime, "Start date", "Start time"
             )
-            if (blockOfWork.state == BlockOfWork.State.FINISHED) {
-                BlockOfWorkItem(
+            if (slice.state == WorkSlice.State.FINISHED) {
+                SliceItem(
                     "Duration", duration.renderDurationFinished(), {}
                 )
             } else {
@@ -59,22 +59,22 @@ fun BlockOfWorkDetailedView(
                     style = MaterialTheme.typography.h4.copy(fontWeight = FontWeight.Bold),
                 )
             }
-            if (blockOfWork.state == BlockOfWork.State.FINISHED) {
+            if (slice.state == WorkSlice.State.FINISHED) {
                 DateTimeFields(
-                    blockOfWork.finishTime, "End date", "End time"
+                    slice.finishTime, "End date", "End time"
                 )
             }
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            when (blockOfWork.state) {
-                BlockOfWork.State.CREATED -> {
+            when (slice.state) {
+                WorkSlice.State.CREATED -> {
                     OutlinedButton(onClick = onStartClicked) {
                         Text("START")
                     }
                 }
-                BlockOfWork.State.PAUSED -> {
+                WorkSlice.State.PAUSED -> {
                     TwoButtons(
                         leftTitle = "RESUME",
                         rightTitle = "FINISH",
@@ -82,7 +82,7 @@ fun BlockOfWorkDetailedView(
                         onRightClicked = onFinishClicked
                     )
                 }
-                BlockOfWork.State.RUNNING -> {
+                WorkSlice.State.RUNNING -> {
                     TwoButtons(
                         leftTitle = "PAUSE",
                         rightTitle = "FINISH",
@@ -90,7 +90,7 @@ fun BlockOfWorkDetailedView(
                         onRightClicked = onFinishClicked
                     )
                 }
-                BlockOfWork.State.FINISHED -> {}
+                WorkSlice.State.FINISHED -> {}
             }
         }
         OutlinedButton(
@@ -103,7 +103,7 @@ fun BlockOfWorkDetailedView(
 }
 
 @Composable
-private fun BlockOfWorkItem(
+private fun SliceItem(
     label: String,
     value: String,
     onValueChange: (String) -> Unit
@@ -179,15 +179,15 @@ private fun TwoButtons(
 
 @Preview(showBackground = true)
 @Composable
-fun FinishedBlockDetailedViewPreview() {
+fun FinishedSliceDetailedViewPreview() {
     TimeTrackerAppTheme {
-        BlockOfWorkDetailedView(
-            blockOfWork = BlockOfWork(
+        SliceDetailedView(
+            slice = WorkSlice(
                 id = 0,
                 project = Project("my project"),
                 task = Task("my task"),
                 description = Description("my work"),
-                state = BlockOfWork.State.FINISHED,
+                state = WorkSlice.State.FINISHED,
                 intervals = testTimeIntervals()
             ),
             duration = Duration.minutes(50),
@@ -205,15 +205,15 @@ fun FinishedBlockDetailedViewPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun RunningBlockDetailedViewPreview() {
+fun RunningSliceDetailedViewPreview() {
     TimeTrackerAppTheme {
-        BlockOfWorkDetailedView(
-            blockOfWork = BlockOfWork(
+        SliceDetailedView(
+            slice = WorkSlice(
                 id = 0,
                 project = Project("my project"),
                 task = Task("my task"),
                 description = Description("my work"),
-                state = BlockOfWork.State.PAUSED,
+                state = WorkSlice.State.PAUSED,
                 intervals = testTimeIntervals()
             ),
             duration = Duration.minutes(50),

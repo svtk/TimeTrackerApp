@@ -6,8 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.timetrackerapp.data.BlocksOfWorkRepository
-import com.example.timetrackerapp.model.BlockOfWork
+import com.example.timetrackerapp.data.SlicesRepository
+import com.example.timetrackerapp.model.WorkSlice
 import com.example.timetrackerapp.model.Description
 import com.example.timetrackerapp.model.Project
 import com.example.timetrackerapp.model.Task
@@ -16,53 +16,54 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class FinishedBlocksViewModel(
-    private val repository: BlocksOfWorkRepository
+class FinishedSlicesViewModel(
+    private val repository: SlicesRepository
 ) : ViewModel() {
 
-    var chosenBlockId by mutableStateOf<Int?>(null)
-    fun updateChosenBlock(id: Int?) {
-        chosenBlockId = id
+    var chosenSliceId by mutableStateOf<Int?>(null)
+        private set
+    fun updateChosenSlice(id: Int?) {
+        chosenSliceId = id
     }
 
-    val finishedBlocks: Flow<List<BlockOfWork>> =
-        repository.observeFinishedBlocks().stateIn(
+    val finishedSlices: Flow<List<WorkSlice>> =
+        repository.observeFinishedSlices().stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(),
             emptyList()
         )
 
-    private fun updateBlock(
-        id: Int, transform: BlockOfWork.() -> BlockOfWork
+    private fun updateSlice(
+        id: Int, transform: WorkSlice.() -> WorkSlice
     ) {
         viewModelScope.launch {
-            val result = repository.getFinishedBlock(id)
-            result.getOrNull()?.let { block ->
-                repository.updateFinishedBlock(block.transform())
+            val result = repository.getFinishedSlice(id)
+            result.getOrNull()?.let { slice ->
+                repository.updateFinishedSlice(slice.transform())
             }
         }
     }
 
     fun onProjectChanged(id: Int, projectName: String) {
-        updateBlock(id) { copy(project = Project(projectName)) }
+        updateSlice(id) { copy(project = Project(projectName)) }
     }
 
     fun onTaskChanged(id: Int, taskName: String) {
-        updateBlock(id) { copy(task = Task(taskName)) }
+        updateSlice(id) { copy(task = Task(taskName)) }
     }
 
     fun onDescriptionChanged(id: Int, description: String) {
-        updateBlock(id) { copy(description = Description(description)) }
+        updateSlice(id) { copy(description = Description(description)) }
     }
 
     companion object {
         fun provideFactory(
-            repository: BlocksOfWorkRepository
+            repository: SlicesRepository
         ): ViewModelProvider.Factory {
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                    return FinishedBlocksViewModel(repository) as T
+                    return FinishedSlicesViewModel(repository) as T
                 }
             }
         }

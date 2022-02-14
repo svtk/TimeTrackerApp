@@ -1,4 +1,4 @@
-package com.example.timetrackerapp
+package com.example.timetrackerapp.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -26,18 +26,18 @@ import kotlinx.datetime.toInstant
 import kotlin.time.Duration
 
 @Composable
-fun BlockOfWorkListContent(
-    blocks: List<BlockOfWork>,
+fun SliceListView(
+    slices: List<WorkSlice>,
     onCardClicked: (id: Int) -> Unit,
-    onSimilarBlockStarted: (id: Int) -> Unit,
+    onSimilarSliceStarted: (id: Int) -> Unit,
 ) {
     LazyColumn(modifier = Modifier.padding(8.dp)) {
-        items(blocks) { block ->
-            BlockOfWorkCard(
-                blockOfWork = block,
-                duration = block.duration,
+        items(slices) { slice ->
+            SliceCard(
+                slice = slice,
+                duration = slice.duration,
                 onCardClicked = onCardClicked,
-                onStartClicked = onSimilarBlockStarted,
+                onStartClicked = onSimilarSliceStarted,
                 onFinishClicked = { },
             )
         }
@@ -45,8 +45,8 @@ fun BlockOfWorkListContent(
 }
 
 @Composable
-fun BlockOfWorkCard(
-    blockOfWork: BlockOfWork,
+fun SliceCard(
+    slice: WorkSlice,
     duration: Duration,
     onCardClicked: (id: Int) -> Unit,
     onStartClicked: (id: Int) -> Unit,
@@ -61,7 +61,7 @@ fun BlockOfWorkCard(
                 modifier =
                 Modifier
                     .padding(start = 8.dp, top = 4.dp, end = 8.dp, bottom = 4.dp)
-                    .clickable(onClick = { onCardClicked(blockOfWork.id) })
+                    .clickable(onClick = { onCardClicked(slice.id) })
                     .fillMaxWidth(0.8f)
             ) {
                 Row {
@@ -70,16 +70,16 @@ fun BlockOfWorkCard(
                         style = MaterialTheme.typography.body1,
                         overflow = TextOverflow.Ellipsis,
                         softWrap = false,
-                        text = if (blockOfWork.project.value.isNotEmpty())
-                            blockOfWork.project.value +
-                                    if (blockOfWork.task.value.isNotEmpty()) ": ${blockOfWork.task.value}" else ""
+                        text = if (slice.project.value.isNotEmpty())
+                            slice.project.value +
+                                    if (slice.task.value.isNotEmpty()) ": ${slice.task.value}" else ""
                         else "(no project)",
                     )
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.End,
                         style = MaterialTheme.typography.body1,
-                        text = duration.renderDuration(blockOfWork.state),
+                        text = duration.renderDuration(slice.state),
                     )
                 }
                 Row {
@@ -88,41 +88,41 @@ fun BlockOfWorkCard(
                         style = MaterialTheme.typography.caption,
                         overflow = TextOverflow.Ellipsis,
                         softWrap = false,
-                        text = blockOfWork.description.value,
+                        text = slice.description.value,
                     )
                     val finishTimeText =
-                        if (blockOfWork.state == BlockOfWork.State.FINISHED)
-                            blockOfWork.finishTime.renderTime()
+                        if (slice.state == WorkSlice.State.FINISHED)
+                            slice.finishTime.renderTime()
                         else
                             "..."
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.End,
                         style = MaterialTheme.typography.caption,
-                        text = "${blockOfWork.startTime.renderTime()} - $finishTimeText",
+                        text = "${slice.startTime.renderTime()} - $finishTimeText",
                     )
                 }
             }
-            when (blockOfWork.state) {
-                BlockOfWork.State.RUNNING -> {
-                    IconButton(onClick = { onFinishClicked(blockOfWork.id) }) {
+            when (slice.state) {
+                WorkSlice.State.RUNNING -> {
+                    IconButton(onClick = { onFinishClicked(slice.id) }) {
                         Icon(
                             imageVector = Icons.Filled.StopCircle,
                             contentDescription = "Finish",
                         )
                     }
                 }
-                BlockOfWork.State.PAUSED -> {
-                    IconButton(onClick = { onStartClicked(blockOfWork.id) }) {
+                WorkSlice.State.PAUSED -> {
+                    IconButton(onClick = { onStartClicked(slice.id) }) {
                         Icon(
                             imageVector = Icons.Filled.PlayCircle,
                             contentDescription = "Resume",
                         )
                     }
                 }
-                BlockOfWork.State.CREATED -> {}
-                BlockOfWork.State.FINISHED -> {
-                    IconButton(onClick = { onStartClicked(blockOfWork.id) }) {
+                WorkSlice.State.CREATED -> {}
+                WorkSlice.State.FINISHED -> {
+                    IconButton(onClick = { onStartClicked(slice.id) }) {
                         Icon(
                             imageVector = Icons.Filled.PlayCircle,
                             contentDescription = "Start",
@@ -137,12 +137,12 @@ fun BlockOfWorkCard(
 
 @Preview(showBackground = true)
 @Composable
-fun BlockOfWorkListPreview() {
+fun SliceListPreview() {
     TimeTrackerAppTheme {
-        BlockOfWorkListContent(
-            blocks = testTimeBlocks(),
+        SliceListView(
+            slices = createTestSlices(),
             onCardClicked = {},
-            onSimilarBlockStarted = {},
+            onSimilarSliceStarted = {},
         )
     }
 }
@@ -154,8 +154,8 @@ fun testTimeInterval(isoDate: String, duration: Duration) =
         ), duration
     )
 
-fun testTimeBlocks() = listOf(
-    BlockOfWork(
+fun createTestSlices() = listOf(
+    WorkSlice(
         id = 0,
         project = Project("project 1"),
         task = Task("task 1"),
@@ -164,9 +164,9 @@ fun testTimeBlocks() = listOf(
             testTimeInterval("2022-01-05T10:00", Duration.minutes(10)),
             testTimeInterval("2022-01-05T10:20", Duration.minutes(15)),
         ),
-        state = BlockOfWork.State.FINISHED,
+        state = WorkSlice.State.FINISHED,
     ),
-    BlockOfWork(
+    WorkSlice(
         id = 1,
         project = Project("project 2 - very long title"),
         task = Task("task 2 - also long"),
@@ -175,6 +175,6 @@ fun testTimeBlocks() = listOf(
             testTimeInterval("2022-01-26T11:30", Duration.minutes(20)),
             testTimeInterval("2022-01-26T13:00", Duration.minutes(30)),
         ),
-        state = BlockOfWork.State.FINISHED,
+        state = WorkSlice.State.FINISHED,
     ),
 )

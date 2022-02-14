@@ -1,4 +1,4 @@
-package com.example.timetrackerapp
+package com.example.timetrackerapp.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -16,48 +16,48 @@ import kotlin.time.Duration
 
 @Composable
 fun MainView(
-    blockOfWork: BlockOfWork?,
+    slice: WorkSlice?,
     duration: Duration?,
-    finishedBlocks: List<BlockOfWork>,
+    finishedSlices: List<WorkSlice>,
     currentDescription: String,
     onDescriptionUpdate: (String) -> Unit,
-    onNewBlock: () -> Unit,
+    onNewSlice: () -> Unit,
     onCardClicked: (id: Int) -> Unit,
-    onSimilarBlockStarted: (id: Int) -> Unit,
-    onCurrentBlockResumed: () -> Unit,
-    onCurrentBlockFinished: () -> Unit,
+    onSimilarSliceStarted: (id: Int) -> Unit,
+    onCurrentSliceResumed: () -> Unit,
+    onCurrentSliceFinished: () -> Unit,
 ) {
     Column {
         Box(modifier = Modifier.padding(8.dp)) {
-            if (blockOfWork == null) {
-                StartingNewBlock(
+            if (slice == null) {
+                StartingNewSlice(
                     description = currentDescription,
                     onDescriptionUpdate = onDescriptionUpdate,
-                    onNewBlock = onNewBlock
+                    onNewSlice = onNewSlice
                 )
             } else {
-                BlockOfWorkCard(
-                    blockOfWork = blockOfWork,
-                    duration = duration ?: blockOfWork.duration,
+                SliceCard(
+                    slice = slice,
+                    duration = duration ?: slice.duration,
                     onCardClicked = onCardClicked,
-                    onStartClicked = { onCurrentBlockResumed() },
-                    onFinishClicked = { onCurrentBlockFinished() },
+                    onStartClicked = { onCurrentSliceResumed() },
+                    onFinishClicked = { onCurrentSliceFinished() },
                 )
             }
         }
-        BlockOfWorkListContent(
-            blocks = finishedBlocks,
+        SliceListView(
+            slices = finishedSlices,
             onCardClicked = onCardClicked,
-            onSimilarBlockStarted = onSimilarBlockStarted,
+            onSimilarSliceStarted = onSimilarSliceStarted,
         )
     }
 }
 
 @Composable
-fun StartingNewBlock(
+fun StartingNewSlice(
     description: String,
     onDescriptionUpdate: (String) -> Unit,
-    onNewBlock: () -> Unit
+    onNewSlice: () -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -70,7 +70,7 @@ fun StartingNewBlock(
             label = { Text("I'm working on...") },
         )
         IconButton(
-            onClick = onNewBlock,
+            onClick = onNewSlice,
             modifier = Modifier.fillMaxWidth(),
         ) {
             Icon(
@@ -87,22 +87,22 @@ fun StartingNewBlock(
 fun MainScreenRunningTaskPreview() {
     TimeTrackerAppTheme {
         MainView(
-            blockOfWork = BlockOfWork(
+            slice = WorkSlice(
                 0,
                 Project("my Project"),
                 Task("my Task"),
                 Description("my description"),
-                BlockOfWork.State.RUNNING,
+                WorkSlice.State.RUNNING,
                 testTimeIntervals(),
             ),
             duration = null,
-            finishedBlocks = testTimeBlocks(),
+            finishedSlices = createTestSlices(),
             currentDescription = "",
             onDescriptionUpdate = {},
-            onNewBlock = {},
+            onNewSlice = {},
             onCardClicked = {},
-            onSimilarBlockStarted = {},
-            onCurrentBlockResumed = {},
+            onSimilarSliceStarted = {},
+            onCurrentSliceResumed = {},
         ) {}
     }
 }
@@ -112,15 +112,15 @@ fun MainScreenRunningTaskPreview() {
 fun MainScreenChoosingTaskPreview() {
     TimeTrackerAppTheme {
         MainView(
-            blockOfWork = null,
+            slice = null,
             duration = null,
-            finishedBlocks = testTimeBlocks(),
+            finishedSlices = createTestSlices(),
             currentDescription = "",
             onDescriptionUpdate = {},
-            onNewBlock = {},
+            onNewSlice = {},
             onCardClicked = {},
-            onSimilarBlockStarted = {},
-            onCurrentBlockResumed = {},
+            onSimilarSliceStarted = {},
+            onCurrentSliceResumed = {},
         ) {}
     }
 }

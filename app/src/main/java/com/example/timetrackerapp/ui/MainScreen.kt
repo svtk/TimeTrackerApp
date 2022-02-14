@@ -3,58 +3,55 @@ package com.example.timetrackerapp.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.example.timetrackerapp.BlockOfWorkDetailedView
-import com.example.timetrackerapp.MainView
 import com.example.timetrackerapp.model.Project
-import com.example.timetrackerapp.model.RunningBlockViewModel
 import com.example.timetrackerapp.model.Task
 
 @Composable
 fun MainScreen(
-    runningBlockViewModel: RunningBlockViewModel,
-    finishedBlocksViewModel: FinishedBlocksViewModel,
+    runningSliceViewModel: RunningSliceViewModel,
+    finishedSlicesViewModel: FinishedSlicesViewModel,
 ) {
-    val finishedBlocks by finishedBlocksViewModel.finishedBlocks.collectAsState(listOf())
-    fun findFinishedBlockById(id: Int?) = finishedBlocks.find { it.id == id }
+    val finishedSlices by finishedSlicesViewModel.finishedSlices.collectAsState(listOf())
+    fun findFinishedSliceById(id: Int?) = finishedSlices.find { it.id == id }
 
-    fun startNewBlock(description: String, project: Project, task: Task) {
-        val id = runningBlockViewModel.startNewTimeBlock(description, project, task)
-        runningBlockViewModel.updateDescription("")
-        finishedBlocksViewModel.updateChosenBlock(id)
+    fun startNewSlice(description: String, project: Project, task: Task) {
+        val id = runningSliceViewModel.startNewSlice(description, project, task)
+        runningSliceViewModel.updateDescription("")
+        finishedSlicesViewModel.updateChosenSlice(id)
     }
 
-    fun finishRunningBlock() {
-        runningBlockViewModel.onFinishClicked()
-        finishedBlocksViewModel.updateChosenBlock(id = null)
+    fun finishRunningSlice() {
+        runningSliceViewModel.onFinishClicked()
+        finishedSlicesViewModel.updateChosenSlice(id = null)
     }
 
-    fun startSimilarBlock(id: Int) {
-        finishRunningBlock()
-        val originalBlock = findFinishedBlockById(id) ?: return
-        startNewBlock(originalBlock.description.value, originalBlock.project, originalBlock.task)
+    fun startSimilarSlice(id: Int) {
+        finishRunningSlice()
+        val originalSlice = findFinishedSliceById(id) ?: return
+        startNewSlice(originalSlice.description.value, originalSlice.project, originalSlice.task)
     }
 
-    val runningBlock = runningBlockViewModel.blockOfWork
-    if (runningBlock != null && finishedBlocksViewModel.chosenBlockId == runningBlock.id) {
-        BlockOfWorkDetailedView(
-            blockOfWork = runningBlock,
-            duration = runningBlockViewModel.getCurrentDuration().value,
-            onProjectChanged = runningBlockViewModel::onProjectChanged,
-            onTaskChanged = runningBlockViewModel::onTaskChanged,
-            onDescriptionChanged = runningBlockViewModel::onDescriptionChanged,
-            onStartClicked = runningBlockViewModel::onStartClicked,
-            onPauseClicked = runningBlockViewModel::onPauseClicked,
-            onResumeClicked = runningBlockViewModel::onResumeClicked,
-            onFinishClicked = ::finishRunningBlock,
-            onBackClicked = { finishedBlocksViewModel.updateChosenBlock(null) }
+    val runningSlice = runningSliceViewModel.slice
+    if (runningSlice != null && finishedSlicesViewModel.chosenSliceId == runningSlice.id) {
+        SliceDetailedView(
+            slice = runningSlice,
+            duration = runningSliceViewModel.getCurrentDuration().value,
+            onProjectChanged = runningSliceViewModel::onProjectChanged,
+            onTaskChanged = runningSliceViewModel::onTaskChanged,
+            onDescriptionChanged = runningSliceViewModel::onDescriptionChanged,
+            onStartClicked = runningSliceViewModel::onStartClicked,
+            onPauseClicked = runningSliceViewModel::onPauseClicked,
+            onResumeClicked = runningSliceViewModel::onResumeClicked,
+            onFinishClicked = ::finishRunningSlice,
+            onBackClicked = { finishedSlicesViewModel.updateChosenSlice(null) }
         )
         return
     }
-    val chosenFinishedBlock = findFinishedBlockById(finishedBlocksViewModel.chosenBlockId)
-    if (chosenFinishedBlock != null) {
-        BlockOfWorkDetailedView(
-            blockOfWork = chosenFinishedBlock,
-            duration = chosenFinishedBlock.duration,
+    val chosenFinishedSlice = findFinishedSliceById(finishedSlicesViewModel.chosenSliceId)
+    if (chosenFinishedSlice != null) {
+        SliceDetailedView(
+            slice = chosenFinishedSlice,
+            duration = chosenFinishedSlice.duration,
             onProjectChanged = {},
             onTaskChanged = {},
             onDescriptionChanged = {},
@@ -62,23 +59,23 @@ fun MainScreen(
             onPauseClicked = {},
             onResumeClicked = {},
             onFinishClicked = {},
-            onBackClicked = { finishedBlocksViewModel.updateChosenBlock(null) }
+            onBackClicked = { finishedSlicesViewModel.updateChosenSlice(null) }
         )
         return
     }
     MainView(
-        blockOfWork = runningBlock,
-        duration = if (runningBlock != null)
-            runningBlockViewModel.getCurrentDuration().value
+        slice = runningSlice,
+        duration = if (runningSlice != null)
+            runningSliceViewModel.getCurrentDuration().value
         else
             null,
-        finishedBlocks = finishedBlocks,
-        currentDescription = runningBlockViewModel.currentDescription,
-        onDescriptionUpdate = runningBlockViewModel::updateDescription,
-        onNewBlock = { startNewBlock(runningBlockViewModel.currentDescription, Project(""), Task("")) },
-        onCardClicked = finishedBlocksViewModel::updateChosenBlock,
-        onSimilarBlockStarted = { id -> startSimilarBlock(id) },
-        onCurrentBlockResumed = runningBlockViewModel::onResumeClicked,
-        onCurrentBlockFinished = ::finishRunningBlock,
+        finishedSlices = finishedSlices,
+        currentDescription = runningSliceViewModel.currentDescription,
+        onDescriptionUpdate = runningSliceViewModel::updateDescription,
+        onNewSlice = { startNewSlice(runningSliceViewModel.currentDescription, Project(""), Task("")) },
+        onCardClicked = finishedSlicesViewModel::updateChosenSlice,
+        onSimilarSliceStarted = { id -> startSimilarSlice(id) },
+        onCurrentSliceResumed = runningSliceViewModel::onResumeClicked,
+        onCurrentSliceFinished = ::finishRunningSlice,
     )
 }
