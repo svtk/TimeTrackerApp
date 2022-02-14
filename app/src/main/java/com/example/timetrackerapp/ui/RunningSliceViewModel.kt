@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.timetrackerapp.data.SlicesRepository
 import com.example.timetrackerapp.model.*
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
@@ -28,12 +28,10 @@ class RunningSliceViewModel(
         currentDescription = newText
     }
 
-    @Composable
-    fun getCurrentDuration(): State<Duration> = ticker
-        .tickFlow
-        .map { slice?.duration ?: Duration.ZERO }
-        .distinctUntilChanged()
-        .collectAsState(Duration.ZERO)
+    val currentDuration: Flow<Duration> =
+        ticker
+            .tickFlow
+            .map { slice?.duration ?: Duration.ZERO }
 
     fun startNewSlice(
         description: String,

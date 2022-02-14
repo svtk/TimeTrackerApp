@@ -5,6 +5,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.example.timetrackerapp.model.Project
 import com.example.timetrackerapp.model.Task
+import kotlin.time.Duration
 
 @Composable
 fun MainScreen(
@@ -13,6 +14,8 @@ fun MainScreen(
 ) {
     val finishedSlices by finishedSlicesViewModel.finishedSlices.collectAsState(listOf())
     fun findFinishedSliceById(id: Int?) = finishedSlices.find { it.id == id }
+
+    val currentDuration by runningSliceViewModel.currentDuration.collectAsState(Duration.ZERO)
 
     fun startNewSlice(description: String, project: Project, task: Task) {
         val id = runningSliceViewModel.startNewSlice(description, project, task)
@@ -35,7 +38,7 @@ fun MainScreen(
     if (runningSlice != null && finishedSlicesViewModel.chosenSliceId == runningSlice.id) {
         SliceDetailedView(
             slice = runningSlice,
-            duration = runningSliceViewModel.getCurrentDuration().value,
+            duration = currentDuration,
             onProjectChanged = runningSliceViewModel::onProjectChanged,
             onTaskChanged = runningSliceViewModel::onTaskChanged,
             onDescriptionChanged = runningSliceViewModel::onDescriptionChanged,
@@ -63,10 +66,7 @@ fun MainScreen(
     }
     MainView(
         slice = runningSlice,
-        duration = if (runningSlice != null)
-            runningSliceViewModel.getCurrentDuration().value
-        else
-            null,
+        duration = if (runningSlice != null) currentDuration else null,
         finishedSlices = finishedSlices,
         currentDescription = runningSliceViewModel.currentDescription,
         onDescriptionUpdate = runningSliceViewModel::updateDescription,
