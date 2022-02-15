@@ -41,6 +41,7 @@ fun SliceDetailedView(
     onStartTimeChange: (LocalDateTime) -> Unit,
     onFinishDateChange: (LocalDate) -> Unit,
     onFinishTimeChange: (LocalDateTime) -> Unit,
+    onDurationChange: (Duration) -> Unit
 ) {
     Column(Modifier.padding(8.dp)) {
         SliceItem(
@@ -58,7 +59,9 @@ fun SliceDetailedView(
         )
         if (slice.state == WorkSlice.State.FINISHED) {
             SliceItem(
-                "Duration", duration.renderDurationFinished(), {}
+                "Duration",
+                duration.renderDurationFinished(),
+                onValueChange = { value -> Duration.parseOrNull(value)?.let(onDurationChange) }
             )
         } else {
             Text(
@@ -229,6 +232,7 @@ fun FinishedSliceDetailedViewPreview() {
             onStartTimeChange = {},
             onFinishDateChange = {},
             onFinishTimeChange = {},
+            onDurationChange = {},
         )
     }
 }
@@ -258,6 +262,7 @@ fun RunningSliceDetailedViewPreview() {
             onStartTimeChange = {},
             onFinishDateChange = {},
             onFinishTimeChange = {},
+            onDurationChange = {},
         )
     }
 }

@@ -50,6 +50,7 @@ fun Navigation(
             onStartTimeChange = runningSliceViewModel::onStartTimeChanged,
             onFinishDateChange = {},
             onFinishTimeChange = {},
+            onDurationChange = {},
         )
         return
     }
@@ -69,6 +70,7 @@ fun Navigation(
             onStartTimeChange = finishedSlicesViewModel::onStartTimeChanged,
             onFinishDateChange = finishedSlicesViewModel::onFinishDateChanged,
             onFinishTimeChange = finishedSlicesViewModel::onFinishTimeChanged,
+            onDurationChange = finishedSlicesViewModel::onDurationChanged,
         )
         return
     }

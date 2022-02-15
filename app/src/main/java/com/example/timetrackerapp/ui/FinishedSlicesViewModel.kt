@@ -17,6 +17,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlin.time.Duration
 
 class FinishedSlicesViewModel(
     private val repository: SlicesRepository
@@ -81,6 +82,10 @@ class FinishedSlicesViewModel(
 
     fun onFinishTimeChanged(newTime: LocalDateTime) {
         updateSlice { copy(finishInstant = newTime.toInstant(TimeZone.currentSystemDefault())) }
+    }
+
+    fun onDurationChanged(duration: Duration) {
+        updateSlice { copy(duration = duration) }
     }
 
     companion object {
