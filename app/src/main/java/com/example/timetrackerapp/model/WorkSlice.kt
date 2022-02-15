@@ -4,6 +4,7 @@ import kotlinx.datetime.*
 import kotlinx.datetime.TimeZone
 import java.time.format.TextStyle
 import java.util.*
+import kotlin.math.absoluteValue
 import kotlin.time.Duration
 
 data class WorkSlice(
@@ -97,9 +98,12 @@ fun List<TimeInterval>.countDuration() =
         sum + interval.duration
     }
 
-private fun renderTimeComponents(hours: Long, minutes: Int, seconds: Int? = null) =
-    "${renderTimeComponent(hours)}:${renderTimeComponent(minutes)}" +
-            if (seconds != null) ":${renderTimeComponent(seconds)}" else ""
+private fun renderTimeComponents(hours: Long, minutes: Int, seconds: Int? = null): String {
+    val sign = if (hours < 0 || minutes < 0 || (seconds != null && seconds < 0)) "-" else ""
+    return sign + renderTimeComponent(hours.absoluteValue) + ":" +
+            renderTimeComponent(minutes.absoluteValue) +
+            if (seconds != null) ":${renderTimeComponent(seconds.absoluteValue)}" else ""
+}
 
 private fun renderTimeComponent(timeComponent: Number) = "%02d".format(timeComponent)
 
