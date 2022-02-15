@@ -18,10 +18,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.timetrackerapp.model.*
 import com.example.timetrackerapp.ui.theme.TimeTrackerAppTheme
+import com.example.timetrackerapp.util.*
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 @Composable
@@ -206,13 +208,14 @@ private fun TwoButtons(
 fun FinishedSliceDetailedViewPreview() {
     TimeTrackerAppTheme {
         SliceDetailedView(
-            slice = WorkSlice(
+            slice = FinishedSlice(
                 id = 0,
                 project = Project("my project"),
                 task = Task("my task"),
                 description = Description("my work"),
-                state = WorkSlice.State.FINISHED,
-                intervals = testTimeIntervals()
+                startInstant = testInstant("2022-01-26T11:30"),
+                finishInstant = testInstant("2022-01-26T13:00"),
+                duration = 1.hours,
             ),
             duration = 50.minutes,
             onProjectChanged = {},
@@ -235,7 +238,7 @@ fun FinishedSliceDetailedViewPreview() {
 fun RunningSliceDetailedViewPreview() {
     TimeTrackerAppTheme {
         SliceDetailedView(
-            slice = WorkSlice(
+            slice = RunningSlice(
                 id = 0,
                 project = Project("my project"),
                 task = Task("my task"),
@@ -258,10 +261,3 @@ fun RunningSliceDetailedViewPreview() {
         )
     }
 }
-
-
-@Composable
-fun testTimeIntervals() = listOf(
-    testTimeInterval("2022-01-26T11:30", 20.minutes),
-    testTimeInterval("2022-01-26T13:00", 30.minutes),
-)

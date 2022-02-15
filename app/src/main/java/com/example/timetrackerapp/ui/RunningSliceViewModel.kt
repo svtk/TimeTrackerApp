@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.timetrackerapp.data.SlicesRepository
 import com.example.timetrackerapp.model.*
+import com.example.timetrackerapp.util.replaceDate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -20,7 +21,7 @@ class RunningSliceViewModel(
     var currentDescription by mutableStateOf("")
         private set
 
-    var slice: WorkSlice? by mutableStateOf(null)
+    var slice: RunningSlice? by mutableStateOf(null)
         private set
 
     // TODO should we pause ticker while there's no running work slice?
@@ -40,7 +41,7 @@ class RunningSliceViewModel(
         project: Project,
         task: Task,
     ): Int {
-        slice = WorkSlice(
+        slice = RunningSlice(
             id = 0,
             project,
             task,
@@ -54,7 +55,7 @@ class RunningSliceViewModel(
         return 0
     }
 
-    private inline fun setState(update: WorkSlice.() -> WorkSlice) {
+    private inline fun setState(update: RunningSlice.() -> RunningSlice) {
         slice = slice?.update()
         slice?.let {
             viewModelScope.launch {
@@ -65,21 +66,13 @@ class RunningSliceViewModel(
 
     fun onStartDateChanged(newDate: LocalDate) {
         setState {
-            val newStartTime = LocalDateTime(
-                year = newDate.year,
-                month = newDate.month,
-                dayOfMonth = newDate.dayOfMonth,
-                hour = startTime.hour,
-                minute = startTime.minute,
-                second = startTime.second,
-                nanosecond = startTime.nanosecond
-            )
+            val newStartTime = startTime.replaceDate(newDate)
             copy(intervals = intervals.map { it.copy(newStartTime = newStartTime) })
         }
     }
 
-    fun onStartTimeChanged(localDateTime: LocalDateTime) {
-        setState { copy(intervals = intervals.map { it.copy(newStartTime = localDateTime) }) }
+    fun onStartTimeChanged(newTime: LocalDateTime) {
+        setState { copy(intervals = intervals.map { it.copy(newStartTime = newTime) }) }
     }
 
     fun onProjectChanged(projectName: String) {

@@ -1,4 +1,4 @@
-package com.example.timetrackerapp.model
+package com.example.timetrackerapp.ui
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay

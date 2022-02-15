@@ -7,14 +7,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.timetrackerapp.data.SlicesRepository
-import com.example.timetrackerapp.model.WorkSlice
-import com.example.timetrackerapp.model.Description
-import com.example.timetrackerapp.model.Project
-import com.example.timetrackerapp.model.Task
+import com.example.timetrackerapp.model.*
+import com.example.timetrackerapp.util.replaceDate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 
 class FinishedSlicesViewModel(
     private val repository: SlicesRepository
@@ -22,11 +24,12 @@ class FinishedSlicesViewModel(
 
     var chosenSliceId by mutableStateOf<Int?>(null)
         private set
+
     fun updateChosenSlice(id: Int?) {
         chosenSliceId = id
     }
 
-    val finishedSlices: Flow<List<WorkSlice>> =
+    val finishedSlices: Flow<List<FinishedSlice>> =
         repository.observeFinishedSlices().stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(),
@@ -34,26 +37,50 @@ class FinishedSlicesViewModel(
         )
 
     private fun updateSlice(
-        id: Int, transform: WorkSlice.() -> WorkSlice
+        transform: FinishedSlice.() -> FinishedSlice
     ) {
-        viewModelScope.launch {
-            val result = repository.getFinishedSlice(id)
-            result.getOrNull()?.let { slice ->
-                repository.updateFinishedSlice(slice.transform())
+        chosenSliceId?.let { id ->
+            viewModelScope.launch {
+                val result = repository.getFinishedSlice(id)
+                result.getOrNull()?.let { slice ->
+                    repository.updateFinishedSlice(slice.transform())
+                }
             }
         }
     }
 
-    fun onProjectChanged(id: Int, projectName: String) {
-        updateSlice(id) { copy(project = Project(projectName)) }
+    fun onProjectChanged(projectName: String) {
+        updateSlice { copy(project = Project(projectName)) }
     }
 
-    fun onTaskChanged(id: Int, taskName: String) {
-        updateSlice(id) { copy(task = Task(taskName)) }
+    fun onTaskChanged(taskName: String) {
+        updateSlice { copy(task = Task(taskName)) }
     }
 
-    fun onDescriptionChanged(id: Int, description: String) {
-        updateSlice(id) { copy(description = Description(description)) }
+    fun onDescriptionChanged(description: String) {
+        updateSlice { copy(description = Description(description)) }
+    }
+
+    fun onStartDateChanged(newDate: LocalDate) {
+        updateSlice {
+            val newStartTime = startTime.replaceDate(newDate)
+            copy(startInstant = newStartTime.toInstant(TimeZone.currentSystemDefault()))
+        }
+    }
+
+    fun onStartTimeChanged(newTime: LocalDateTime) {
+        updateSlice { copy(startInstant = newTime.toInstant(TimeZone.currentSystemDefault())) }
+    }
+
+    fun onFinishDateChanged(newDate: LocalDate) {
+        updateSlice {
+            val newFinishTime = finishTime.replaceDate(newDate)
+            copy(startInstant = newFinishTime.toInstant(TimeZone.currentSystemDefault()))
+        }
+    }
+
+    fun onFinishTimeChanged(newTime: LocalDateTime) {
+        updateSlice { copy(finishInstant = newTime.toInstant(TimeZone.currentSystemDefault())) }
     }
 
     companion object {

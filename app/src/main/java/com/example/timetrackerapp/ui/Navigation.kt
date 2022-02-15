@@ -8,7 +8,7 @@ import com.example.timetrackerapp.model.Task
 import kotlin.time.Duration
 
 @Composable
-fun MainScreen(
+fun Navigation(
     runningSliceViewModel: RunningSliceViewModel,
     finishedSlicesViewModel: FinishedSlicesViewModel,
 ) {
@@ -58,17 +58,17 @@ fun MainScreen(
         SliceDetailedView(
             slice = chosenFinishedSlice,
             duration = chosenFinishedSlice.duration,
-            onProjectChanged = {},
-            onTaskChanged = {},
-            onDescriptionChanged = {},
+            onProjectChanged = finishedSlicesViewModel::onProjectChanged,
+            onTaskChanged = finishedSlicesViewModel::onTaskChanged,
+            onDescriptionChanged = finishedSlicesViewModel::onDescriptionChanged,
             onPauseClicked = {},
             onResumeClicked = {},
             onFinishClicked = {},
             onBackClicked = { finishedSlicesViewModel.updateChosenSlice(null) },
-            onStartDateChange = {},
-            onStartTimeChange = {},
-            onFinishDateChange = {},
-            onFinishTimeChange = {},
+            onStartDateChange = finishedSlicesViewModel::onStartDateChanged,
+            onStartTimeChange = finishedSlicesViewModel::onStartTimeChanged,
+            onFinishDateChange = finishedSlicesViewModel::onFinishDateChanged,
+            onFinishTimeChange = finishedSlicesViewModel::onFinishTimeChanged,
         )
         return
     }
@@ -80,7 +80,7 @@ fun MainScreen(
         onDescriptionUpdate = runningSliceViewModel::updateDescription,
         onNewSlice = { startNewSlice(runningSliceViewModel.currentDescription, Project(""), Task("")) },
         onCardClicked = finishedSlicesViewModel::updateChosenSlice,
-        onSimilarSliceStarted = { id -> startSimilarSlice(id) },
+        onSimilarSliceStarted = ::startSimilarSlice,
         onCurrentSliceResumed = runningSliceViewModel::onResumeClicked,
         onCurrentSliceFinished = ::finishRunningSlice,
     )

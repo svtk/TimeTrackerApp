@@ -11,6 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.timetrackerapp.model.*
 import com.example.timetrackerapp.ui.theme.TimeTrackerAppTheme
+import com.example.timetrackerapp.util.testTimeIntervals
 import kotlin.time.Duration
 
 
@@ -87,7 +88,7 @@ fun StartingNewSlice(
 fun MainScreenRunningTaskPreview() {
     TimeTrackerAppTheme {
         MainView(
-            slice = WorkSlice(
+            slice = RunningSlice(
                 0,
                 Project("my Project"),
                 Task("my Task"),

@@ -20,9 +20,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.timetrackerapp.model.*
 import com.example.timetrackerapp.ui.theme.TimeTrackerAppTheme
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
+import com.example.timetrackerapp.util.renderDuration
+import com.example.timetrackerapp.util.renderTime
+import com.example.timetrackerapp.util.testInstant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
@@ -147,34 +147,23 @@ fun SliceListPreview() {
     }
 }
 
-fun testTimeInterval(isoDate: String, duration: Duration) =
-    ClosedTimeInterval(
-        LocalDateTime.parse(isoDate).toInstant(
-            TimeZone.currentSystemDefault()
-        ), duration
-    )
-
 fun createTestSlices() = listOf(
-    WorkSlice(
+    FinishedSlice(
         id = 0,
         project = Project("project 1"),
         task = Task("task 1"),
         description = Description("short description"),
-        state = WorkSlice.State.FINISHED,
-        intervals = listOf(
-            testTimeInterval("2022-01-05T10:00", 10.minutes),
-            testTimeInterval("2022-01-05T10:20", 15.minutes),
-        ),
+        startInstant = testInstant("2022-01-05T10:00"),
+        finishInstant = testInstant("2022-01-05T10:20"),
+        duration = 25.minutes,
     ),
-    WorkSlice(
+    FinishedSlice(
         id = 1,
         project = Project("project 2 - very long title"),
         task = Task("task 2 - also long"),
         description = Description("very long second description"),
-        state = WorkSlice.State.FINISHED,
-        intervals = listOf(
-            testTimeInterval("2022-01-26T11:30", 20.minutes),
-            testTimeInterval("2022-01-26T13:00", 30.minutes),
-        ),
+        startInstant = testInstant("2022-01-26T11:30"),
+        finishInstant = testInstant("2022-01-26T13:00"),
+        duration = 50.minutes,
     ),
 )

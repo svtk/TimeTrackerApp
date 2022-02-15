@@ -8,7 +8,7 @@ import androidx.compose.material.*
 import com.example.timetrackerapp.data.FakeSlicesRepository
 import com.example.timetrackerapp.ui.RunningSliceViewModel
 import com.example.timetrackerapp.ui.FinishedSlicesViewModel
-import com.example.timetrackerapp.ui.MainScreen
+import com.example.timetrackerapp.ui.Navigation
 import com.example.timetrackerapp.ui.theme.TimeTrackerAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
                     },
                 ) {
                     Surface(color = MaterialTheme.colors.background) {
-                        MainScreen(
+                        Navigation(
                             runningSliceViewModel,
                             finishedSlicesViewModel,
                         )
