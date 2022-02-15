@@ -22,6 +22,7 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 @Composable
 fun SliceDetailedView(
@@ -213,7 +214,7 @@ fun FinishedSliceDetailedViewPreview() {
                 state = WorkSlice.State.FINISHED,
                 intervals = testTimeIntervals()
             ),
-            duration = Duration.minutes(50),
+            duration = 50.minutes,
             onProjectChanged = {},
             onTaskChanged = {},
             onDescriptionChanged = {},
@@ -242,7 +243,7 @@ fun RunningSliceDetailedViewPreview() {
                 state = WorkSlice.State.PAUSED,
                 intervals = testTimeIntervals()
             ),
-            duration = Duration.minutes(50),
+            duration = 50.minutes,
             onProjectChanged = {},
             onTaskChanged = {},
             onDescriptionChanged = {},
@@ -261,6 +262,6 @@ fun RunningSliceDetailedViewPreview() {
 
 @Composable
 fun testTimeIntervals() = listOf(
-    testTimeInterval("2022-01-26T11:30", Duration.minutes(20)),
-    testTimeInterval("2022-01-26T13:00", Duration.minutes(30)),
+    testTimeInterval("2022-01-26T11:30", 20.minutes),
+    testTimeInterval("2022-01-26T13:00", 30.minutes),
 )

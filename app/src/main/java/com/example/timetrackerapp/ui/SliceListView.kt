@@ -24,6 +24,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 @Composable
 fun SliceListView(
@@ -161,8 +162,8 @@ fun createTestSlices() = listOf(
         description = Description("short description"),
         state = WorkSlice.State.FINISHED,
         intervals = listOf(
-            testTimeInterval("2022-01-05T10:00", Duration.minutes(10)),
-            testTimeInterval("2022-01-05T10:20", Duration.minutes(15)),
+            testTimeInterval("2022-01-05T10:00", 10.minutes),
+            testTimeInterval("2022-01-05T10:20", 15.minutes),
         ),
     ),
     WorkSlice(
@@ -172,8 +173,8 @@ fun createTestSlices() = listOf(
         description = Description("very long second description"),
         state = WorkSlice.State.FINISHED,
         intervals = listOf(
-            testTimeInterval("2022-01-26T11:30", Duration.minutes(20)),
-            testTimeInterval("2022-01-26T13:00", Duration.minutes(30)),
+            testTimeInterval("2022-01-26T11:30", 20.minutes),
+            testTimeInterval("2022-01-26T13:00", 30.minutes),
         ),
     ),
 )
