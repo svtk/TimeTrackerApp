@@ -9,6 +9,8 @@ import com.example.timetrackerapp.model.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlin.time.Duration
 
 class RunningSliceViewModel(
@@ -59,6 +61,25 @@ class RunningSliceViewModel(
                 repository.updateRunningSlice(it)
             }
         }
+    }
+
+    fun onStartDateChanged(newDate: LocalDate) {
+        setState {
+            val newStartTime = LocalDateTime(
+                year = newDate.year,
+                month = newDate.month,
+                dayOfMonth = newDate.dayOfMonth,
+                hour = startTime.hour,
+                minute = startTime.minute,
+                second = startTime.second,
+                nanosecond = startTime.nanosecond
+            )
+            copy(intervals = intervals.map { it.copy(newStartTime = newStartTime) })
+        }
+    }
+
+    fun onStartTimeChanged(localDateTime: LocalDateTime) {
+        setState { copy(intervals = intervals.map { it.copy(newStartTime = localDateTime) }) }
     }
 
     fun onProjectChanged(projectName: String) {

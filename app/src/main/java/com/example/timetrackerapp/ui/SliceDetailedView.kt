@@ -1,6 +1,10 @@
 package com.example.timetrackerapp.ui
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.OutlinedTextField
@@ -13,8 +17,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.timetrackerapp.model.*
-import com.example.timetrackerapp.model.Task
 import com.example.timetrackerapp.ui.theme.TimeTrackerAppTheme
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlin.time.Duration
 
@@ -29,6 +34,10 @@ fun SliceDetailedView(
     onResumeClicked: () -> Unit,
     onFinishClicked: () -> Unit,
     onBackClicked: () -> Unit,
+    onStartDateChange: (LocalDate) -> Unit,
+    onStartTimeChange: (LocalDateTime) -> Unit,
+    onFinishDateChange: (LocalDate) -> Unit,
+    onFinishTimeChange: (LocalDateTime) -> Unit,
 ) {
     Column(Modifier.padding(8.dp)) {
         SliceItem(
@@ -41,7 +50,8 @@ fun SliceDetailedView(
             "Task", slice.task.value, onTaskChanged
         )
         DateTimeFields(
-            slice.startTime, "Start date", "Start time"
+            slice.startTime, "Start date", "Start time",
+            onStartDateChange, onStartTimeChange,
         )
         if (slice.state == WorkSlice.State.FINISHED) {
             SliceItem(
@@ -59,7 +69,8 @@ fun SliceDetailedView(
         }
         if (slice.state == WorkSlice.State.FINISHED) {
             DateTimeFields(
-                slice.finishTime, "End date", "End time"
+                slice.finishTime, "End date", "End time",
+                onFinishDateChange, onFinishTimeChange,
             )
         }
         Row(
@@ -112,16 +123,33 @@ private fun SliceItem(
 private fun DateTimeFields(
     time: LocalDateTime,
     dateLabel: String,
-    timeLabel: String
+    timeLabel: String,
+    onDateChange: (LocalDate) -> Unit,
+    onTimeChange: (LocalDateTime) -> Unit,
 ) {
+    val dateDialogState = rememberMaterialDialogState()
+    DatePicker(
+        dateDialogState = dateDialogState,
+        onDateChange = onDateChange
+    )
+    val timeDialogState = rememberMaterialDialogState()
+    TimePicker(
+        timeDialogState = timeDialogState,
+        date = time.date,
+        onTimeChange = onTimeChange
+    )
+
     Row {
         OutlinedTextField(
             value = time.renderDate(),
             onValueChange = { },
             modifier = Modifier
                 .fillMaxWidth(0.5f)
-                .padding(end = 4.dp),
+                .padding(end = 4.dp)
+                .clickable(onClick = { dateDialogState.show() })
+            ,
             readOnly = true,
+            enabled = false,
             label = { Text(dateLabel) }
         )
         OutlinedTextField(
@@ -129,8 +157,11 @@ private fun DateTimeFields(
             onValueChange = { },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 4.dp),
+                .padding(start = 4.dp)
+                .clickable(onClick = { timeDialogState.show() })
+            ,
             readOnly = true,
+            enabled = false,
             label = { Text(timeLabel) }
         )
     }
@@ -189,7 +220,11 @@ fun FinishedSliceDetailedViewPreview() {
             onPauseClicked = {},
             onResumeClicked = {},
             onFinishClicked = {},
-            onBackClicked = {}
+            onBackClicked = {},
+            onStartDateChange = {},
+            onStartTimeChange = {},
+            onFinishDateChange = {},
+            onFinishTimeChange = {},
         )
     }
 }
@@ -214,7 +249,11 @@ fun RunningSliceDetailedViewPreview() {
             onPauseClicked = {},
             onResumeClicked = {},
             onFinishClicked = {},
-            onBackClicked = {}
+            onBackClicked = {},
+            onStartDateChange = {},
+            onStartTimeChange = {},
+            onFinishDateChange = {},
+            onFinishTimeChange = {},
         )
     }
 }

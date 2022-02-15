@@ -52,6 +52,8 @@ sealed interface TimeInterval {
         get() = (startInstant + duration).toLocalDateTime(TimeZone.currentSystemDefault())
 
     fun finish(): TimeInterval
+
+    fun copy(newStartTime: LocalDateTime): TimeInterval
 }
 
 data class ClosedTimeInterval(
@@ -63,6 +65,9 @@ data class ClosedTimeInterval(
         get() = true
 
     override fun finish() = this
+
+    override fun copy(newStartTime: LocalDateTime) =
+        copy(startInstant = newStartTime.toInstant(TimeZone.currentSystemDefault()))
 }
 
 data class OpenTimeInterval(
@@ -76,6 +81,9 @@ data class OpenTimeInterval(
         get() = false
 
     override fun finish() = ClosedTimeInterval(startInstant, duration)
+
+    override fun copy(newStartTime: LocalDateTime) =
+        copy(startInstant = newStartTime.toInstant(TimeZone.currentSystemDefault()))
 }
 
 fun List<TimeInterval>.startTime() = first().startTime
@@ -89,19 +97,24 @@ fun List<TimeInterval>.countDuration() =
         sum + interval.duration
     }
 
-private fun renderTimeComponents(hours: Int, minutes: Int, seconds: Int? = null) =
+private fun renderTimeComponents(hours: Long, minutes: Int, seconds: Int? = null) =
     "${renderTimeComponent(hours)}:${renderTimeComponent(minutes)}" +
             if (seconds != null) ":${renderTimeComponent(seconds)}" else ""
 
-private fun renderTimeComponent(timeComponent: Int) = "%02d".format(timeComponent)
+private fun renderTimeComponent(timeComponent: Number) = "%02d".format(timeComponent)
 
 fun LocalDateTime.renderDate(): String =
     dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.ENGLISH) +
             ", $dayOfMonth " +
             month.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
 
+fun LocalDate.render(): String =
+    dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.ENGLISH) +
+            ", $dayOfMonth " +
+            month.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
+
 fun LocalDateTime.renderTime(): String =
-    renderTimeComponents(hour, minute)
+    renderTimeComponents(hour.toLong(), minute)
 
 fun Duration.renderDuration(state: WorkSlice.State): String =
     if (state == WorkSlice.State.FINISHED)
@@ -116,7 +129,7 @@ fun Duration.renderDurationLive(): String =
 
 fun Duration.renderDurationFinished(): String =
     toComponents { hours, minutes, seconds, _ ->
-        if (hours == 0 && minutes == 0) "${seconds}s"
-        else if (hours == 0) "${minutes}m"
+        if (hours == 0L && minutes == 0) "${seconds}s"
+        else if (hours == 0L) "${minutes}m"
         else "${hours}h ${minutes}m"
     }

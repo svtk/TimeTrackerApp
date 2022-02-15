@@ -45,7 +45,11 @@ fun MainScreen(
             onPauseClicked = runningSliceViewModel::onPauseClicked,
             onResumeClicked = runningSliceViewModel::onResumeClicked,
             onFinishClicked = ::finishRunningSlice,
-            onBackClicked = { finishedSlicesViewModel.updateChosenSlice(null) }
+            onBackClicked = { finishedSlicesViewModel.updateChosenSlice(null) },
+            onStartDateChange = runningSliceViewModel::onStartDateChanged,
+            onStartTimeChange = runningSliceViewModel::onStartTimeChanged,
+            onFinishDateChange = {},
+            onFinishTimeChange = {},
         )
         return
     }
@@ -60,7 +64,11 @@ fun MainScreen(
             onPauseClicked = {},
             onResumeClicked = {},
             onFinishClicked = {},
-            onBackClicked = { finishedSlicesViewModel.updateChosenSlice(null) }
+            onBackClicked = { finishedSlicesViewModel.updateChosenSlice(null) },
+            onStartDateChange = {},
+            onStartTimeChange = {},
+            onFinishDateChange = {},
+            onFinishTimeChange = {},
         )
         return
     }
