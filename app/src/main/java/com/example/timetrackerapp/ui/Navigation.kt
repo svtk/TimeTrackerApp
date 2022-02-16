@@ -39,18 +39,22 @@ fun Navigation(
         SliceDetailedView(
             slice = runningSlice,
             duration = currentDuration,
-            onProjectChanged = runningSliceViewModel::onProjectChanged,
-            onTaskChanged = runningSliceViewModel::onTaskChanged,
-            onDescriptionChanged = runningSliceViewModel::onDescriptionChanged,
-            onPauseClicked = runningSliceViewModel::onPauseClicked,
-            onResumeClicked = runningSliceViewModel::onResumeClicked,
-            onFinishClicked = ::finishRunningSlice,
+            sliceInfoUpdates = SliceInfoUpdates(
+                onProjectChanged = runningSliceViewModel::onProjectChanged,
+                onTaskChanged = runningSliceViewModel::onTaskChanged,
+                onDescriptionChanged = runningSliceViewModel::onDescriptionChanged,
+                onStartDateChange = runningSliceViewModel::onStartDateChanged,
+                onStartTimeChange = runningSliceViewModel::onStartTimeChanged,
+                onFinishDateChange = {},
+                onFinishTimeChange = {},
+                onDurationChange = {},
+            ),
+            runningSliceUpdates = RunningSliceUpdates(
+                onPauseClicked = runningSliceViewModel::onPauseClicked,
+                onResumeClicked = runningSliceViewModel::onResumeClicked,
+                onFinishClicked = ::finishRunningSlice,
+            ),
             onBackClicked = { finishedSlicesViewModel.updateChosenSlice(null) },
-            onStartDateChange = runningSliceViewModel::onStartDateChanged,
-            onStartTimeChange = runningSliceViewModel::onStartTimeChanged,
-            onFinishDateChange = {},
-            onFinishTimeChange = {},
-            onDurationChange = {},
         )
         return
     }
@@ -59,18 +63,18 @@ fun Navigation(
         SliceDetailedView(
             slice = chosenFinishedSlice,
             duration = chosenFinishedSlice.duration,
-            onProjectChanged = finishedSlicesViewModel::onProjectChanged,
-            onTaskChanged = finishedSlicesViewModel::onTaskChanged,
-            onDescriptionChanged = finishedSlicesViewModel::onDescriptionChanged,
-            onPauseClicked = {},
-            onResumeClicked = {},
-            onFinishClicked = {},
+            sliceInfoUpdates = SliceInfoUpdates(
+                onProjectChanged = finishedSlicesViewModel::onProjectChanged,
+                onTaskChanged = finishedSlicesViewModel::onTaskChanged,
+                onDescriptionChanged = finishedSlicesViewModel::onDescriptionChanged,
+                onStartDateChange = finishedSlicesViewModel::onStartDateChanged,
+                onStartTimeChange = finishedSlicesViewModel::onStartTimeChanged,
+                onFinishDateChange = finishedSlicesViewModel::onFinishDateChanged,
+                onFinishTimeChange = finishedSlicesViewModel::onFinishTimeChanged,
+                onDurationChange = finishedSlicesViewModel::onDurationChanged,
+            ),
+            runningSliceUpdates = emptyRunningSliceUpdates,
             onBackClicked = { finishedSlicesViewModel.updateChosenSlice(null) },
-            onStartDateChange = finishedSlicesViewModel::onStartDateChanged,
-            onStartTimeChange = finishedSlicesViewModel::onStartTimeChanged,
-            onFinishDateChange = finishedSlicesViewModel::onFinishDateChanged,
-            onFinishTimeChange = finishedSlicesViewModel::onFinishTimeChanged,
-            onDurationChange = finishedSlicesViewModel::onDurationChanged,
         )
         return
     }
@@ -80,7 +84,13 @@ fun Navigation(
         finishedSlices = finishedSlices,
         currentDescription = runningSliceViewModel.currentDescription,
         onDescriptionUpdate = runningSliceViewModel::updateDescription,
-        onNewSlice = { startNewSlice(runningSliceViewModel.currentDescription, Project(""), Task("")) },
+        onNewSlice = {
+            startNewSlice(
+                runningSliceViewModel.currentDescription,
+                Project(""),
+                Task("")
+            )
+        },
         onCardClicked = finishedSlicesViewModel::updateChosenSlice,
         onSimilarSliceStarted = ::startSimilarSlice,
         onCurrentSliceResumed = runningSliceViewModel::onResumeClicked,

@@ -30,38 +30,29 @@ import kotlin.time.Duration.Companion.minutes
 fun SliceDetailedView(
     slice: WorkSlice,
     duration: Duration,
-    onProjectChanged: (String) -> Unit,
-    onTaskChanged: (String) -> Unit,
-    onDescriptionChanged: (String) -> Unit,
-    onPauseClicked: () -> Unit,
-    onResumeClicked: () -> Unit,
-    onFinishClicked: () -> Unit,
+    sliceInfoUpdates: SliceInfoUpdates,
+    runningSliceUpdates: RunningSliceUpdates,
     onBackClicked: () -> Unit,
-    onStartDateChange: (LocalDate) -> Unit,
-    onStartTimeChange: (LocalDateTime) -> Unit,
-    onFinishDateChange: (LocalDate) -> Unit,
-    onFinishTimeChange: (LocalDateTime) -> Unit,
-    onDurationChange: (Duration) -> Unit
 ) {
     Column(Modifier.padding(8.dp)) {
         SliceItem(
-            "Description", slice.description.value, onDescriptionChanged
+            "Description", slice.description.value, sliceInfoUpdates.onDescriptionChanged
         )
         SliceItem(
-            "Project", slice.project.value, onProjectChanged
+            "Project", slice.project.value, sliceInfoUpdates.onProjectChanged
         )
         SliceItem(
-            "Task", slice.task.value, onTaskChanged
+            "Task", slice.task.value, sliceInfoUpdates.onTaskChanged
         )
         DateTimeFields(
             slice.startTime, "Start date", "Start time",
-            onStartDateChange, onStartTimeChange,
+            sliceInfoUpdates.onStartDateChange, sliceInfoUpdates.onStartTimeChange,
         )
         if (slice.state == WorkSlice.State.FINISHED) {
             SliceItem(
                 "Duration",
                 duration.renderDurationFinished(),
-                onValueChange = { value -> Duration.parseOrNull(value)?.let(onDurationChange) }
+                onValueChange = { value -> Duration.parseOrNull(value)?.let(sliceInfoUpdates.onDurationChange) }
             )
         } else {
             Text(
@@ -76,7 +67,7 @@ fun SliceDetailedView(
         if (slice.state == WorkSlice.State.FINISHED) {
             DateTimeFields(
                 slice.finishTime, "End date", "End time",
-                onFinishDateChange, onFinishTimeChange,
+                sliceInfoUpdates.onFinishDateChange, sliceInfoUpdates.onFinishTimeChange,
             )
         }
         Row(
@@ -87,16 +78,16 @@ fun SliceDetailedView(
                     TwoButtons(
                         leftTitle = "RESUME",
                         rightTitle = "FINISH",
-                        onLeftClicked = onResumeClicked,
-                        onRightClicked = onFinishClicked
+                        onLeftClicked = runningSliceUpdates.onResumeClicked,
+                        onRightClicked = runningSliceUpdates.onFinishClicked
                     )
                 }
                 WorkSlice.State.RUNNING -> {
                     TwoButtons(
                         leftTitle = "PAUSE",
                         rightTitle = "FINISH",
-                        onLeftClicked = onPauseClicked,
-                        onRightClicked = onFinishClicked
+                        onLeftClicked = runningSliceUpdates.onPauseClicked,
+                        onRightClicked = runningSliceUpdates.onFinishClicked
                     )
                 }
                 WorkSlice.State.FINISHED -> {}
@@ -221,18 +212,9 @@ fun FinishedSliceDetailedViewPreview() {
                 duration = 1.hours,
             ),
             duration = 50.minutes,
-            onProjectChanged = {},
-            onTaskChanged = {},
-            onDescriptionChanged = {},
-            onPauseClicked = {},
-            onResumeClicked = {},
-            onFinishClicked = {},
+            sliceInfoUpdates = emptySliceInfoUpdates,
+            runningSliceUpdates = emptyRunningSliceUpdates,
             onBackClicked = {},
-            onStartDateChange = {},
-            onStartTimeChange = {},
-            onFinishDateChange = {},
-            onFinishTimeChange = {},
-            onDurationChange = {},
         )
     }
 }
@@ -251,18 +233,9 @@ fun RunningSliceDetailedViewPreview() {
                 intervals = testTimeIntervals()
             ),
             duration = 50.minutes,
-            onProjectChanged = {},
-            onTaskChanged = {},
-            onDescriptionChanged = {},
-            onPauseClicked = {},
-            onResumeClicked = {},
-            onFinishClicked = {},
+            sliceInfoUpdates = emptySliceInfoUpdates,
+            runningSliceUpdates = emptyRunningSliceUpdates,
             onBackClicked = {},
-            onStartDateChange = {},
-            onStartTimeChange = {},
-            onFinishDateChange = {},
-            onFinishTimeChange = {},
-            onDurationChange = {},
         )
     }
 }
