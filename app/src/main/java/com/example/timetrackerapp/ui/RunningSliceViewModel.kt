@@ -67,12 +67,12 @@ class RunningSliceViewModel(
     fun onStartDateChanged(newDate: LocalDate) {
         setState {
             val newStartTime = startTime.replaceDate(newDate)
-            copy(intervals = intervals.map { it.copy(newStartTime = newStartTime) })
+            copy(intervals = intervals.replaceStartTime(newStartTime))
         }
     }
 
     fun onStartTimeChanged(newTime: LocalDateTime) {
-        setState { copy(intervals = intervals.map { it.copy(newStartTime = newTime) }) }
+        setState { copy(intervals = intervals.replaceStartTime(newTime)) }
     }
 
     fun onProjectChanged(projectName: String) {

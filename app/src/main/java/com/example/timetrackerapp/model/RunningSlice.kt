@@ -10,7 +10,7 @@ data class RunningSlice(
     override val description: Description,
     override val state: WorkSlice.State,
     val intervals: List<TimeInterval>,
-): WorkSlice {
+) : WorkSlice {
 
     init {
         check(intervals.isNotEmpty())
@@ -34,8 +34,6 @@ sealed interface TimeInterval {
     val isFinished: Boolean
 
     fun finish(): TimeInterval
-
-    fun copy(newStartTime: LocalDateTime): TimeInterval
 }
 
 data class ClosedTimeInterval(
@@ -47,9 +45,6 @@ data class ClosedTimeInterval(
         get() = true
 
     override fun finish() = this
-
-    override fun copy(newStartTime: LocalDateTime) =
-        copy(startInstant = newStartTime.toInstant(TimeZone.currentSystemDefault()))
 }
 
 data class OpenTimeInterval(
@@ -63,9 +58,6 @@ data class OpenTimeInterval(
         get() = false
 
     override fun finish() = ClosedTimeInterval(startInstant, duration)
-
-    override fun copy(newStartTime: LocalDateTime) =
-        copy(startInstant = newStartTime.toInstant(TimeZone.currentSystemDefault()))
 }
 
 fun List<TimeInterval>.closeLast(): List<TimeInterval> =
@@ -75,4 +67,13 @@ fun List<TimeInterval>.closeLast(): List<TimeInterval> =
 fun List<TimeInterval>.countDuration() =
     fold(Duration.ZERO) { sum, interval ->
         sum + interval.duration
+    }
+
+fun List<TimeInterval>.replaceStartTime(newStartTime: LocalDateTime): List<TimeInterval> =
+    map {
+        val startInstant = newStartTime.toInstant(TimeZone.currentSystemDefault())
+        when (it) {
+            is ClosedTimeInterval -> it.copy(startInstant = startInstant)
+            is OpenTimeInterval -> it.copy(startInstant = startInstant)
+        }
     }
