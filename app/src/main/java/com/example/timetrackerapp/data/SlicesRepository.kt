@@ -1,20 +1,23 @@
 package com.example.timetrackerapp.data
 
-import com.example.timetrackerapp.model.FinishedSlice
-import com.example.timetrackerapp.model.RunningSlice
+import com.example.timetrackerapp.model.*
 import kotlinx.coroutines.flow.Flow
 
 interface SlicesRepository {
 
-    fun observeFinishedSlices(): Flow<List<FinishedSlice>>
+    fun observeFinishedSlices(): Flow<List<WorkSlice>>
 
-    suspend fun getFinishedSlice(id: Int): Result<FinishedSlice?>
+    suspend fun getFinishedSlice(id: Int): Result<WorkSlice?>
 
-    suspend fun updateFinishedSlice(slice: FinishedSlice)
+    suspend fun updateFinishedSlice(id: Int, sliceChanges: SliceChanges)
 
     fun observeRunningSlice(): Flow<RunningSlice?>
 
-    suspend fun updateRunningSlice(slice: RunningSlice)
+    suspend fun startRunningSlice(description: Description, task: Task, project: Project)
+
+    suspend fun updateRunningSlice(sliceChanges: SliceChanges)
+
+    suspend fun changeRunningSliceState(state: WorkSlice.State)
 
     suspend fun finishRunningSlice()
 }

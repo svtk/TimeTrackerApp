@@ -93,14 +93,14 @@ fun SliceCard(
                     )
                     val finishTimeText =
                         if (slice.state == WorkSlice.State.FINISHED)
-                            slice.finishTime.renderTime()
+                            slice.finishInstant.renderTime()
                         else
                             "..."
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.End,
                         style = MaterialTheme.typography.caption,
-                        text = "${slice.startTime.renderTime()} - $finishTimeText",
+                        text = "${slice.startInstant.renderTime()} - $finishTimeText",
                     )
                 }
             }
@@ -148,7 +148,7 @@ fun SliceListPreview() {
 }
 
 fun createTestSlices() = listOf(
-    FinishedSlice(
+    WorkSlice(
         id = 0,
         project = Project("project 1"),
         task = Task("task 1"),
@@ -156,8 +156,9 @@ fun createTestSlices() = listOf(
         startInstant = testInstant("2022-01-05T10:00"),
         finishInstant = testInstant("2022-01-05T10:20"),
         duration = 25.minutes,
+        state = WorkSlice.State.FINISHED,
     ),
-    FinishedSlice(
+    WorkSlice(
         id = 1,
         project = Project("project 2 - very long title"),
         task = Task("task 2 - also long"),
@@ -165,5 +166,6 @@ fun createTestSlices() = listOf(
         startInstant = testInstant("2022-01-26T11:30"),
         finishInstant = testInstant("2022-01-26T13:00"),
         duration = 50.minutes,
+        state = WorkSlice.State.FINISHED,
     ),
 )

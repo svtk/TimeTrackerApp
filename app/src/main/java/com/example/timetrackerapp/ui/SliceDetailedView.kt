@@ -20,8 +20,7 @@ import com.example.timetrackerapp.model.*
 import com.example.timetrackerapp.ui.theme.TimeTrackerAppTheme
 import com.example.timetrackerapp.util.*
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.*
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -29,7 +28,6 @@ import kotlin.time.Duration.Companion.minutes
 @Composable
 fun SliceDetailedView(
     slice: WorkSlice,
-    duration: Duration,
     sliceInfoUpdates: SliceInfoUpdates,
     runningSliceUpdates: RunningSliceUpdates,
     onBackClicked: () -> Unit,
@@ -45,18 +43,18 @@ fun SliceDetailedView(
             "Task", slice.task.value, sliceInfoUpdates.onTaskChanged
         )
         DateTimeFields(
-            slice.startTime, "Start date", "Start time",
+            slice.startInstant, "Start date", "Start time",
             sliceInfoUpdates.onStartDateChange, sliceInfoUpdates.onStartTimeChange,
         )
         if (slice.state == WorkSlice.State.FINISHED) {
             SliceItem(
                 "Duration",
-                duration.renderDurationFinished(),
+                slice.duration.renderDurationFinished(),
                 onValueChange = { value -> Duration.parseOrNull(value)?.let(sliceInfoUpdates.onDurationChange) }
             )
         } else {
             Text(
-                text = duration.renderDurationLive(),
+                text = slice.duration.renderDurationLive(),
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -66,7 +64,7 @@ fun SliceDetailedView(
         }
         if (slice.state == WorkSlice.State.FINISHED) {
             DateTimeFields(
-                slice.finishTime, "End date", "End time",
+                slice.finishInstant, "End date", "End time",
                 sliceInfoUpdates.onFinishDateChange, sliceInfoUpdates.onFinishTimeChange,
             )
         }
@@ -93,11 +91,19 @@ fun SliceDetailedView(
                 WorkSlice.State.FINISHED -> {}
             }
         }
-        OutlinedButton(
-            onClick = onBackClicked,
-            modifier = Modifier.padding(top = 20.dp)
-        ) {
-            Text("BACK")
+        Row {
+            OutlinedButton(
+                onClick = onBackClicked,
+                modifier = Modifier.padding(top = 20.dp)
+            ) {
+                Text("BACK")
+            }
+            OutlinedButton(
+                onClick = sliceInfoUpdates.onSave,
+                modifier = Modifier.padding(top = 20.dp)
+            ) {
+                Text("SAVE")
+            }
         }
     }
 }
@@ -118,21 +124,23 @@ private fun SliceItem(
 
 @Composable
 private fun DateTimeFields(
-    time: LocalDateTime,
+    instant: Instant,
     dateLabel: String,
     timeLabel: String,
     onDateChange: (LocalDate) -> Unit,
     onTimeChange: (LocalDateTime) -> Unit,
 ) {
+    val time = instant.toLocalDateTime(TimeZone.currentSystemDefault())
     val dateDialogState = rememberMaterialDialogState()
     DatePicker(
         dateDialogState = dateDialogState,
+        initialDate = time.date,
         onDateChange = onDateChange
     )
     val timeDialogState = rememberMaterialDialogState()
     TimePicker(
         timeDialogState = timeDialogState,
-        date = time.date,
+        initialTime = time,
         onTimeChange = onTimeChange
     )
 
@@ -202,7 +210,7 @@ private fun TwoButtons(
 fun FinishedSliceDetailedViewPreview() {
     TimeTrackerAppTheme {
         SliceDetailedView(
-            slice = FinishedSlice(
+            slice = WorkSlice(
                 id = 0,
                 project = Project("my project"),
                 task = Task("my task"),
@@ -210,8 +218,8 @@ fun FinishedSliceDetailedViewPreview() {
                 startInstant = testInstant("2022-01-26T11:30"),
                 finishInstant = testInstant("2022-01-26T13:00"),
                 duration = 1.hours,
+                state = WorkSlice.State.FINISHED,
             ),
-            duration = 50.minutes,
             sliceInfoUpdates = emptySliceInfoUpdates,
             runningSliceUpdates = emptyRunningSliceUpdates,
             onBackClicked = {},
@@ -224,15 +232,16 @@ fun FinishedSliceDetailedViewPreview() {
 fun RunningSliceDetailedViewPreview() {
     TimeTrackerAppTheme {
         SliceDetailedView(
-            slice = RunningSlice(
+            slice = WorkSlice(
                 id = 0,
                 project = Project("my project"),
                 task = Task("my task"),
                 description = Description("my work"),
+                startInstant = testInstant("2022-01-26T11:30"),
+                finishInstant = testInstant("2022-01-26T13:00"),
+                duration = 50.minutes,
                 state = WorkSlice.State.PAUSED,
-                intervals = testTimeIntervals()
             ),
-            duration = 50.minutes,
             sliceInfoUpdates = emptySliceInfoUpdates,
             runningSliceUpdates = emptyRunningSliceUpdates,
             onBackClicked = {},

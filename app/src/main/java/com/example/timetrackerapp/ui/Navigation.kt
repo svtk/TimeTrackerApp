@@ -1,99 +1,42 @@
 package com.example.timetrackerapp.ui
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import com.example.timetrackerapp.model.Project
-import com.example.timetrackerapp.model.Task
-import kotlin.time.Duration
+import androidx.compose.runtime.*
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.timetrackerapp.data.SlicesRepository
+import com.example.timetrackerapp.ui.UIState.*
+
+enum class UIState {
+    HOME, RUNNING_SLICE, FINISHED_SLICE
+}
 
 @Composable
 fun Navigation(
-    runningSliceViewModel: RunningSliceViewModel,
-    finishedSlicesViewModel: FinishedSlicesViewModel,
+    repository: SlicesRepository,
 ) {
-    val finishedSlices by finishedSlicesViewModel.finishedSlices.collectAsState(listOf())
-    fun findFinishedSliceById(id: Int?) = finishedSlices.find { it.id == id }
-
-    val currentDuration by runningSliceViewModel.currentDuration.collectAsState(Duration.ZERO)
-
-    fun startNewSlice(description: String, project: Project, task: Task) {
-        val id = runningSliceViewModel.startNewSlice(description, project, task)
-        runningSliceViewModel.updateDescription("")
-        finishedSlicesViewModel.updateChosenSlice(id)
-    }
-
-    fun finishRunningSlice() {
-        runningSliceViewModel.onFinishClicked()
-        finishedSlicesViewModel.updateChosenSlice(id = null)
-    }
-
-    fun startSimilarSlice(id: Int) {
-        finishRunningSlice()
-        val originalSlice = findFinishedSliceById(id) ?: return
-        startNewSlice(originalSlice.description.value, originalSlice.project, originalSlice.task)
-    }
-
-    val runningSlice = runningSliceViewModel.slice
-    if (runningSlice != null && finishedSlicesViewModel.chosenSliceId == runningSlice.id) {
-        SliceDetailedView(
-            slice = runningSlice,
-            duration = currentDuration,
-            sliceInfoUpdates = SliceInfoUpdates(
-                onProjectChanged = runningSliceViewModel::onProjectChanged,
-                onTaskChanged = runningSliceViewModel::onTaskChanged,
-                onDescriptionChanged = runningSliceViewModel::onDescriptionChanged,
-                onStartDateChange = runningSliceViewModel::onStartDateChanged,
-                onStartTimeChange = runningSliceViewModel::onStartTimeChanged,
-                onFinishDateChange = {},
-                onFinishTimeChange = {},
-                onDurationChange = {},
+    var uiState by remember { mutableStateOf(HOME) }
+    var chosenSliceId by remember { mutableStateOf<Int?>(null)}
+    when (uiState) {
+        RUNNING_SLICE -> RunningSliceView(
+            runningSliceViewModel = viewModel(
+                factory = RunningSliceViewModel.provideFactory(
+                    repository
+                )
             ),
-            runningSliceUpdates = RunningSliceUpdates(
-                onPauseClicked = runningSliceViewModel::onPauseClicked,
-                onResumeClicked = runningSliceViewModel::onResumeClicked,
-                onFinishClicked = ::finishRunningSlice,
-            ),
-            onBackClicked = { finishedSlicesViewModel.updateChosenSlice(null) },
+            navigateToHome = { uiState = HOME },
         )
-        return
-    }
-    val chosenFinishedSlice = findFinishedSliceById(finishedSlicesViewModel.chosenSliceId)
-    if (chosenFinishedSlice != null) {
-        SliceDetailedView(
-            slice = chosenFinishedSlice,
-            duration = chosenFinishedSlice.duration,
-            sliceInfoUpdates = SliceInfoUpdates(
-                onProjectChanged = finishedSlicesViewModel::onProjectChanged,
-                onTaskChanged = finishedSlicesViewModel::onTaskChanged,
-                onDescriptionChanged = finishedSlicesViewModel::onDescriptionChanged,
-                onStartDateChange = finishedSlicesViewModel::onStartDateChanged,
-                onStartTimeChange = finishedSlicesViewModel::onStartTimeChanged,
-                onFinishDateChange = finishedSlicesViewModel::onFinishDateChanged,
-                onFinishTimeChange = finishedSlicesViewModel::onFinishTimeChanged,
-                onDurationChange = finishedSlicesViewModel::onDurationChanged,
+        FINISHED_SLICE -> FinishedSliceView(
+            id = chosenSliceId!!,
+            finishedSliceViewModel = viewModel(
+                factory = FinishedSliceViewModel.provideFactory(
+                    repository
+                )
             ),
-            runningSliceUpdates = emptyRunningSliceUpdates,
-            onBackClicked = { finishedSlicesViewModel.updateChosenSlice(null) },
+            navigateToHome = { uiState = HOME },
         )
-        return
+        HOME -> MainView(
+            homeViewModel = viewModel(factory = HomeViewModel.provideFactory(repository)),
+            navigateToRunningSlice = { uiState = RUNNING_SLICE },
+            navigateToChosenSlice = { id -> chosenSliceId = id; uiState = FINISHED_SLICE },
+        )
     }
-    MainView(
-        slice = runningSlice,
-        duration = if (runningSlice != null) currentDuration else null,
-        finishedSlices = finishedSlices,
-        currentDescription = runningSliceViewModel.currentDescription,
-        onDescriptionUpdate = runningSliceViewModel::updateDescription,
-        onNewSlice = {
-            startNewSlice(
-                runningSliceViewModel.currentDescription,
-                Project(""),
-                Task("")
-            )
-        },
-        onCardClicked = finishedSlicesViewModel::updateChosenSlice,
-        onSimilarSliceStarted = ::startSimilarSlice,
-        onCurrentSliceResumed = runningSliceViewModel::onResumeClicked,
-        onCurrentSliceFinished = ::finishRunningSlice,
-    )
 }

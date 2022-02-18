@@ -7,11 +7,14 @@ import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toKotlinLocalDate
+import java.time.LocalTime
 
 @Composable
 fun DatePicker(
     dateDialogState: MaterialDialogState,
+    initialDate: LocalDate,
     onDateChange: (LocalDate) -> Unit
 ) {
     MaterialDialog(
@@ -21,16 +24,19 @@ fun DatePicker(
             negativeButton("Cancel")
         }
     ) {
-        datepicker { date ->
-            onDateChange(date.toKotlinLocalDate())
-        }
+        datepicker(
+            initialDate = initialDate.toJavaLocalDate(),
+            onDateChange = { date ->
+                onDateChange(date.toKotlinLocalDate())
+            }
+        )
     }
 }
 
 @Composable
 fun TimePicker(
     timeDialogState: MaterialDialogState,
-    date: LocalDate,
+    initialTime: LocalDateTime,
     onTimeChange: (LocalDateTime) -> Unit
 ) {
     MaterialDialog(
@@ -40,18 +46,21 @@ fun TimePicker(
             negativeButton("Cancel")
         }
     ) {
-        timepicker { time ->
-            onTimeChange(
-                LocalDateTime(
-                    year = date.year,
-                    month = date.month,
-                    dayOfMonth = date.dayOfMonth,
-                    hour = time.hour,
-                    minute = time.minute,
-                    second = time.second,
-                    nanosecond = time.nano
+        timepicker(
+            initialTime = LocalTime.of(initialTime.hour, initialTime.minute, initialTime.second),
+            onTimeChange = { time ->
+                onTimeChange(
+                    LocalDateTime(
+                        year = initialTime.year,
+                        month = initialTime.month,
+                        dayOfMonth = initialTime.dayOfMonth,
+                        hour = time.hour,
+                        minute = time.minute,
+                        second = time.second,
+                        nanosecond = time.nano
+                    )
                 )
-            )
-        }
+            }
+        )
     }
 }

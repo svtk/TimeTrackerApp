@@ -13,6 +13,7 @@ data class SliceInfoUpdates(
     val onFinishDateChange: (LocalDate) -> Unit,
     val onFinishTimeChange: (LocalDateTime) -> Unit,
     val onDurationChange: (Duration) -> Unit,
+    val onSave: () -> Unit,
 )
 
 data class RunningSliceUpdates(
@@ -30,6 +31,7 @@ val emptySliceInfoUpdates = SliceInfoUpdates(
     onFinishDateChange = {},
     onFinishTimeChange = {},
     onDurationChange = {},
+    onSave = {},
 )
 
 val emptyRunningSliceUpdates = RunningSliceUpdates(

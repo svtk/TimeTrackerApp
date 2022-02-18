@@ -1,8 +1,11 @@
 package com.example.timetrackerapp.util
 
 import com.example.timetrackerapp.model.WorkSlice
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import java.time.format.TextStyle
 import java.util.*
 import kotlin.math.absoluteValue
@@ -29,6 +32,10 @@ fun LocalDate.render(): String =
 
 fun LocalDateTime.renderTime(): String =
     renderTimeComponents(hour.toLong(), minute)
+
+fun Instant.renderTime(): String =
+    toLocalDateTime(TimeZone.currentSystemDefault())
+        .renderTime()
 
 fun Duration.renderDuration(state: WorkSlice.State): String =
     if (state == WorkSlice.State.FINISHED)

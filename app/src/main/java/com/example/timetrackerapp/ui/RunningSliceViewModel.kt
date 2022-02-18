@@ -6,116 +6,87 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.timetrackerapp.data.SlicesRepository
 import com.example.timetrackerapp.model.*
-import com.example.timetrackerapp.util.replaceDate
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
-import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 class RunningSliceViewModel(
     private val repository: SlicesRepository
 ) : ViewModel() {
 
-    var currentDescription by mutableStateOf("")
-        private set
+    private var sliceChanges: SliceChanges? by mutableStateOf(null)
 
-    var slice: RunningSlice? by mutableStateOf(null)
-        private set
+    // TODO pause ticker when view isn't active
+    private val tickHandler = TickHandler(viewModelScope, 1.seconds)
 
-    // TODO should we pause ticker while there's no running work slice?
-    private val ticker = TickHandler(viewModelScope)
+    val slice: Flow<WorkSlice?> =
+        repository
+            .observeRunningSlice()
+            .convertToWorkSliceAndEmitEverySecond(viewModelScope, tickHandler.tickFlow)
+            .map { it?.applyChanges(sliceChanges) }
 
-    fun updateDescription(newText: String) {
-        currentDescription = newText
+    private inline fun recordChanges(update: SliceChanges.() -> SliceChanges) {
+        sliceChanges = (sliceChanges ?: SliceChanges()).update()
     }
 
-    val currentDuration: Flow<Duration> =
-        ticker
-            .tickFlow
-            .map { slice?.duration ?: Duration.ZERO }
-
-    fun startNewSlice(
-        description: String,
-        project: Project,
-        task: Task,
-    ): Int {
-        slice = RunningSlice(
-            id = 0,
-            project,
-            task,
-            Description(description),
-            WorkSlice.State.RUNNING,
-            listOf(OpenTimeInterval())
-        )
-        viewModelScope.launch {
-            repository.updateRunningSlice(slice!!)
-        }
-        return 0
-    }
-
-    private inline fun setState(update: RunningSlice.() -> RunningSlice) {
-        slice = slice?.update()
-        slice?.let {
+    fun onSave() {
+        sliceChanges?.let { changes ->
             viewModelScope.launch {
-                repository.updateRunningSlice(it)
+                repository.updateRunningSlice(changes)
             }
         }
+        sliceChanges = null
+    }
+
+    fun onDiscard() {
+        sliceChanges = null
     }
 
     fun onStartDateChanged(newDate: LocalDate) {
-        setState {
-            val newStartTime = startTime.replaceDate(newDate)
-            copy(intervals = intervals.replaceStartTime(newStartTime))
-        }
+        recordChanges { copy(newStartDate = newDate) }
+        onSave()
     }
 
     fun onStartTimeChanged(newTime: LocalDateTime) {
-        setState { copy(intervals = intervals.replaceStartTime(newTime)) }
+        recordChanges { copy(newStartTime = newTime) }
+        onSave()
     }
 
     fun onProjectChanged(projectName: String) {
-        setState { copy(project = Project(projectName)) }
+        recordChanges { copy(newProject = Project(projectName)) }
     }
 
     fun onTaskChanged(taskName: String) {
-        setState { copy(task = Task(taskName)) }
+        recordChanges { copy(newTask = Task(taskName)) }
     }
 
     fun onDescriptionChanged(description: String) {
-        setState { copy(description = Description(description)) }
+        recordChanges { copy(newDescription = Description(description)) }
     }
 
     fun onPauseClicked() {
-        setState {
-            copy(
-                state = WorkSlice.State.PAUSED,
-                intervals = intervals.closeLast(),
-            )
+        onSave()
+        viewModelScope.launch {
+            repository.changeRunningSliceState(WorkSlice.State.PAUSED)
         }
     }
 
     fun onResumeClicked() {
-        setState {
-            copy(
-                state = WorkSlice.State.RUNNING,
-                intervals = intervals + OpenTimeInterval()
-            )
+        onSave()
+        viewModelScope.launch {
+            repository.changeRunningSliceState(WorkSlice.State.RUNNING)
         }
     }
 
     fun onFinishClicked() {
-        setState {
-            copy(
-                state = WorkSlice.State.FINISHED,
-                intervals = intervals.closeLast(),
-            )
-        }
-        slice = null
+        onSave()
         viewModelScope.launch {
             repository.finishRunningSlice()
         }
+        sliceChanges = null
     }
 
     companion object {
@@ -124,10 +95,34 @@ class RunningSliceViewModel(
         ): ViewModelProvider.Factory {
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return RunningSliceViewModel(repository) as T
                 }
             }
         }
     }
 }
+
+fun Flow<RunningSlice?>.convertToWorkSliceAndEmitEverySecond(
+    scope: CoroutineScope,
+    tickFlow: Flow<Unit>,
+) =
+    transformAndEmitRegularly(
+        scope = scope,
+        tickFlow = tickFlow,
+        transform = {
+            it?.let { runningSlice ->
+                WorkSlice(
+                    id = runningSlice.id,
+                    project = runningSlice.project,
+                    task = runningSlice.task,
+                    description = runningSlice.description,
+                    startInstant = runningSlice.startInstant,
+                    // we update duration and finish time every second:
+                    finishInstant = runningSlice.countCurrentFinishInstant(),
+                    duration = runningSlice.countCurrentDuration(),
+                    state = if (runningSlice.isPaused) WorkSlice.State.PAUSED else WorkSlice.State.RUNNING
+                )
+            }
+        },
+    )

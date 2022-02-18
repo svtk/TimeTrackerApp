@@ -5,26 +5,55 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.timetrackerapp.model.*
 import com.example.timetrackerapp.ui.theme.TimeTrackerAppTheme
+import com.example.timetrackerapp.util.testInstant
 import com.example.timetrackerapp.util.testTimeIntervals
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
+@Composable
+fun MainView(
+    homeViewModel: HomeViewModel,
+    navigateToRunningSlice: () -> Unit,
+    navigateToChosenSlice: (Int) -> Unit,
+) {
+    val finishedSlices by homeViewModel.finishedSlices.collectAsState()
+    val runningSlice by homeViewModel.
+    runningSlice.collectAsState(null)
+    MainView(
+        slice = runningSlice,
+        finishedSlices = finishedSlices,
+        currentDescription = homeViewModel.currentDescription,
+        onDescriptionUpdate = homeViewModel::updateDescription,
+        onNewSlice = {
+            homeViewModel.startNewSlice()
+            navigateToRunningSlice()
+        },
+        onCardClicked = navigateToChosenSlice,
+        onSimilarSliceStarted = homeViewModel::startSimilarSlice,
+        onCurrentSliceClicked = navigateToRunningSlice,
+        onCurrentSliceResumed = {}, // TODO
+        onCurrentSliceFinished = homeViewModel::finishRunningSlice,
+    )
+}
 
 @Composable
 fun MainView(
     slice: WorkSlice?,
-    duration: Duration?,
     finishedSlices: List<WorkSlice>,
     currentDescription: String,
     onDescriptionUpdate: (String) -> Unit,
     onNewSlice: () -> Unit,
     onCardClicked: (id: Int) -> Unit,
     onSimilarSliceStarted: (id: Int) -> Unit,
+    onCurrentSliceClicked: () -> Unit,
     onCurrentSliceResumed: () -> Unit,
     onCurrentSliceFinished: () -> Unit,
 ) {
@@ -39,8 +68,8 @@ fun MainView(
             } else {
                 SliceCard(
                     slice = slice,
-                    duration = duration ?: slice.duration,
-                    onCardClicked = onCardClicked,
+                    duration = slice.duration,
+                    onCardClicked = { onCurrentSliceClicked() },
                     onStartClicked = { onCurrentSliceResumed() },
                     onFinishClicked = { onCurrentSliceFinished() },
                 )
@@ -88,23 +117,26 @@ fun StartingNewSlice(
 fun MainScreenRunningTaskPreview() {
     TimeTrackerAppTheme {
         MainView(
-            slice = RunningSlice(
+            slice = WorkSlice(
                 0,
                 Project("my Project"),
                 Task("my Task"),
                 Description("my description"),
-                WorkSlice.State.RUNNING,
-                testTimeIntervals(),
+                startInstant = testInstant("2022-01-26T11:30"),
+                finishInstant = testInstant("2022-01-26T13:00"),
+                duration = 50.minutes,
+                state = WorkSlice.State.PAUSED,
             ),
-            duration = null,
             finishedSlices = createTestSlices(),
             currentDescription = "",
             onDescriptionUpdate = {},
             onNewSlice = {},
             onCardClicked = {},
             onSimilarSliceStarted = {},
+            onCurrentSliceClicked = {},
             onCurrentSliceResumed = {},
-        ) {}
+            onCurrentSliceFinished = {},
+        )
     }
 }
 
@@ -114,14 +146,15 @@ fun MainScreenChoosingTaskPreview() {
     TimeTrackerAppTheme {
         MainView(
             slice = null,
-            duration = null,
             finishedSlices = createTestSlices(),
             currentDescription = "",
             onDescriptionUpdate = {},
             onNewSlice = {},
             onCardClicked = {},
             onSimilarSliceStarted = {},
+            onCurrentSliceClicked = {},
             onCurrentSliceResumed = {},
-        ) {}
+            onCurrentSliceFinished = {},
+        )
     }
 }

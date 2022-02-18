@@ -1,9 +1,19 @@
 package com.example.timetrackerapp.util
 
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.*
 
-fun LocalDateTime.replaceDate(
+fun Instant.applyDateAndTimeChanges(
+    newStartDate: LocalDate?,
+    newStartTime: LocalDateTime?
+): Instant {
+    if (newStartDate == null && newStartTime == null) return this
+    return toLocalDateTime(TimeZone.currentSystemDefault())
+        .let { time -> if (newStartDate != null) time.replaceDate(newStartDate) else time }
+        .let { time -> if (newStartTime != null) time.replaceTime(newStartTime) else time }
+        .toInstant(TimeZone.currentSystemDefault())
+}
+
+private fun LocalDateTime.replaceDate(
     newDate: LocalDate
 ) = LocalDateTime(
     year = newDate.year,
@@ -13,4 +23,16 @@ fun LocalDateTime.replaceDate(
     minute = minute,
     second = second,
     nanosecond = nanosecond
+)
+
+private fun LocalDateTime.replaceTime(
+    newTime: LocalDateTime
+) = LocalDateTime(
+    year = year,
+    month = month,
+    dayOfMonth = dayOfMonth,
+    hour = newTime.hour,
+    minute = newTime.minute,
+    second = newTime.second,
+    nanosecond = newTime.nanosecond
 )
