@@ -10,6 +10,7 @@ import com.example.timetrackerapp.data.SlicesRepository
 import com.example.timetrackerapp.model.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.util.*
 import kotlin.time.Duration.Companion.seconds
 
 class HomeViewModel(
@@ -55,7 +56,7 @@ class HomeViewModel(
         Task(""),
     )
 
-    fun startSimilarSlice(id: Int) {
+    fun startSimilarSlice(id: UUID) {
         finishRunningSlice()
         viewModelScope.launch {
             repository.getFinishedSlice(id).getOrNull()?.let { originalSlice ->

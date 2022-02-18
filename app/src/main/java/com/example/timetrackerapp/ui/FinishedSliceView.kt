@@ -1,10 +1,11 @@
 package com.example.timetrackerapp.ui
 
 import androidx.compose.runtime.Composable
+import java.util.*
 
 @Composable
 fun FinishedSliceView(
-    id: Int,
+    id: UUID,
     finishedSliceViewModel: FinishedSliceViewModel,
     navigateToHome: () -> Unit,
 ) {

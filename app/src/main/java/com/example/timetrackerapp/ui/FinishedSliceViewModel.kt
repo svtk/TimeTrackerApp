@@ -11,6 +11,7 @@ import com.example.timetrackerapp.model.*
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import java.util.*
 import kotlin.time.Duration
 
 class FinishedSliceViewModel(
@@ -22,7 +23,7 @@ class FinishedSliceViewModel(
 
     private var sliceChanges: SliceChanges? by mutableStateOf(null)
 
-    fun updateChosenSlice(id: Int) {
+    fun updateChosenSlice(id: UUID) {
         if (slice == null || slice?.id != id) {
             viewModelScope.launch {
                 slice = repository.getFinishedSlice(id).getOrNull()

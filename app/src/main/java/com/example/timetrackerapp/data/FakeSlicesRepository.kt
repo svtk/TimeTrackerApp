@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import java.util.*
 
 class FakeSlicesRepository : SlicesRepository {
     // "fake" in-memory implementation
@@ -15,17 +16,17 @@ class FakeSlicesRepository : SlicesRepository {
 
     private val mutex = Mutex()
 
-    private fun findSliceById(id: Int?) = finishedSlicesStateFlow.value.find { it.id == id }
+    private fun findSliceById(id: UUID?) = finishedSlicesStateFlow.value.find { it.id == id }
 
     override fun observeFinishedSlices(): Flow<List<WorkSlice>> {
         return finishedSlicesStateFlow
     }
 
-    override suspend fun getFinishedSlice(id: Int): Result<WorkSlice?> {
+    override suspend fun getFinishedSlice(id: UUID): Result<WorkSlice?> {
         return Result.success(findSliceById(id))
     }
 
-    override suspend fun updateFinishedSlice(id: Int, sliceChanges: SliceChanges) {
+    override suspend fun updateFinishedSlice(id: UUID, sliceChanges: SliceChanges) {
         mutex.withLock {
             val oldSlice = findSliceById(id) ?: return
             finishedSlicesStateFlow.update { oldSlicesState ->
@@ -41,12 +42,12 @@ class FakeSlicesRepository : SlicesRepository {
 
     override suspend fun startRunningSlice(description: Description, task: Task, project: Project) {
         runningSliceStateFlow.value = RunningSlice(
-            id = 0,
-            project,
-            task,
-            description,
+            id = UUID.randomUUID(),
+            project = project,
+            task = task,
+            description = description,
             isPaused = false,
-            listOf(OpenTimeInterval())
+            intervals = listOf(OpenTimeInterval())
         )
     }
 
@@ -73,10 +74,9 @@ class FakeSlicesRepository : SlicesRepository {
     override suspend fun finishRunningSlice() {
         mutex.withLock {
             runningSliceStateFlow.value?.let { slice ->
-                val nextId = (finishedSlicesStateFlow.value.maxOfOrNull { it.id } ?: 0) + 1
                 finishedSlicesStateFlow.update { list ->
                     list + WorkSlice(
-                        id = nextId,
+                        id = slice.id,
                         project = slice.project,
                         task = slice.task,
                         description = slice.description,

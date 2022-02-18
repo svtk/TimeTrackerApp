@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.timetrackerapp.data.SlicesRepository
 import com.example.timetrackerapp.ui.UIState.*
+import java.util.*
 
 enum class UIState {
     HOME, RUNNING_SLICE, FINISHED_SLICE
@@ -14,7 +15,7 @@ fun Navigation(
     repository: SlicesRepository,
 ) {
     var uiState by remember { mutableStateOf(HOME) }
-    var chosenSliceId by remember { mutableStateOf<Int?>(null)}
+    var chosenSliceId by remember { mutableStateOf<UUID?>(null)}
     when (uiState) {
         RUNNING_SLICE -> RunningSliceView(
             runningSliceViewModel = viewModel(

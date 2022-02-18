@@ -23,14 +23,15 @@ import com.example.timetrackerapp.ui.theme.TimeTrackerAppTheme
 import com.example.timetrackerapp.util.renderDuration
 import com.example.timetrackerapp.util.renderTime
 import com.example.timetrackerapp.util.testInstant
+import java.util.*
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 @Composable
 fun SliceListView(
     slices: List<WorkSlice>,
-    onCardClicked: (id: Int) -> Unit,
-    onSimilarSliceStarted: (id: Int) -> Unit,
+    onCardClicked: (id: UUID) -> Unit,
+    onSimilarSliceStarted: (id: UUID) -> Unit,
 ) {
     LazyColumn(modifier = Modifier.padding(8.dp)) {
         items(slices) { slice ->
@@ -49,9 +50,9 @@ fun SliceListView(
 fun SliceCard(
     slice: WorkSlice,
     duration: Duration,
-    onCardClicked: (id: Int) -> Unit,
-    onStartClicked: (id: Int) -> Unit,
-    onFinishClicked: (id: Int) -> Unit,
+    onCardClicked: (id: UUID) -> Unit,
+    onStartClicked: (id: UUID) -> Unit,
+    onFinishClicked: (id: UUID) -> Unit,
 ) {
     Card(
         modifier = Modifier.padding(4.dp),
@@ -149,7 +150,7 @@ fun SliceListPreview() {
 
 fun createTestSlices() = listOf(
     WorkSlice(
-        id = 0,
+        id = UUID.randomUUID(),
         project = Project("project 1"),
         task = Task("task 1"),
         description = Description("short description"),
@@ -159,7 +160,7 @@ fun createTestSlices() = listOf(
         state = WorkSlice.State.FINISHED,
     ),
     WorkSlice(
-        id = 1,
+        id = UUID.randomUUID(),
         project = Project("project 2 - very long title"),
         task = Task("task 2 - also long"),
         description = Description("very long second description"),

@@ -1,7 +1,10 @@
 package com.example.timetrackerapp.ui
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.runtime.Composable
@@ -11,18 +14,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.timetrackerapp.model.*
+import com.example.timetrackerapp.model.Description
+import com.example.timetrackerapp.model.Project
+import com.example.timetrackerapp.model.Task
+import com.example.timetrackerapp.model.WorkSlice
 import com.example.timetrackerapp.ui.theme.TimeTrackerAppTheme
 import com.example.timetrackerapp.util.testInstant
-import com.example.timetrackerapp.util.testTimeIntervals
-import kotlin.time.Duration
+import java.util.*
 import kotlin.time.Duration.Companion.minutes
 
 @Composable
 fun MainView(
     homeViewModel: HomeViewModel,
     navigateToRunningSlice: () -> Unit,
-    navigateToChosenSlice: (Int) -> Unit,
+    navigateToChosenSlice: (UUID) -> Unit,
 ) {
     val finishedSlices by homeViewModel.finishedSlices.collectAsState()
     val runningSlice by homeViewModel.
@@ -51,8 +56,8 @@ fun MainView(
     currentDescription: String,
     onDescriptionUpdate: (String) -> Unit,
     onNewSlice: () -> Unit,
-    onCardClicked: (id: Int) -> Unit,
-    onSimilarSliceStarted: (id: Int) -> Unit,
+    onCardClicked: (id: UUID) -> Unit,
+    onSimilarSliceStarted: (id: UUID) -> Unit,
     onCurrentSliceClicked: () -> Unit,
     onCurrentSliceResumed: () -> Unit,
     onCurrentSliceFinished: () -> Unit,
@@ -118,7 +123,7 @@ fun MainScreenRunningTaskPreview() {
     TimeTrackerAppTheme {
         MainView(
             slice = WorkSlice(
-                0,
+                UUID.randomUUID(),
                 Project("my Project"),
                 Task("my Task"),
                 Description("my description"),

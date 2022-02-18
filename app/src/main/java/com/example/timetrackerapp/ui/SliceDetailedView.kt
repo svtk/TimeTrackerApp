@@ -21,6 +21,8 @@ import com.example.timetrackerapp.ui.theme.TimeTrackerAppTheme
 import com.example.timetrackerapp.util.*
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.datetime.*
+import kotlinx.datetime.TimeZone
+import java.util.*
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -211,7 +213,7 @@ fun FinishedSliceDetailedViewPreview() {
     TimeTrackerAppTheme {
         SliceDetailedView(
             slice = WorkSlice(
-                id = 0,
+                id = UUID.randomUUID(),
                 project = Project("my project"),
                 task = Task("my task"),
                 description = Description("my work"),
@@ -233,7 +235,7 @@ fun RunningSliceDetailedViewPreview() {
     TimeTrackerAppTheme {
         SliceDetailedView(
             slice = WorkSlice(
-                id = 0,
+                id = UUID.randomUUID(),
                 project = Project("my project"),
                 task = Task("my task"),
                 description = Description("my work"),

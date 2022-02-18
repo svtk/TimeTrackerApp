@@ -1,10 +1,11 @@
 package com.example.timetrackerapp.model
 
 import kotlinx.datetime.*
+import java.util.*
 import kotlin.time.Duration
 
 data class RunningSlice(
-    val id: Int,
+    val id: UUID,
     val project: Project,
     val task: Task,
     val description: Description,
