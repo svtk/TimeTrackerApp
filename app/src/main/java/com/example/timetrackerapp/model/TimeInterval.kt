@@ -10,15 +10,18 @@ sealed interface TimeInterval {
 
     val isFinished: Boolean
 
+    val isArtificial: Boolean
+
     fun finish(): TimeInterval
 }
 
 data class ClosedTimeInterval(
     override val startInstant: Instant,
     override val duration: Duration,
+    override val isArtificial: Boolean = false,
 ) : TimeInterval {
-    constructor(startInstant: Instant, finishInstant: Instant):
-            this(startInstant, duration = finishInstant - startInstant)
+    constructor(startInstant: Instant, finishInstant: Instant, isArtificial: Boolean = false):
+            this(startInstant, duration = finishInstant - startInstant, isArtificial = isArtificial)
 
     override val isFinished: Boolean
         get() = true
@@ -34,6 +37,9 @@ data class OpenTimeInterval(
         get() = Clock.System.now() - startInstant
 
     override val isFinished: Boolean
+        get() = false
+
+    override val isArtificial: Boolean
         get() = false
 
     override fun finish() =

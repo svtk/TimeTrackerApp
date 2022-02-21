@@ -43,13 +43,15 @@ fun RunningSlice.applyChanges(sliceChanges: SliceChanges?): RunningSlice {
         project = sliceChanges.newProject ?: project,
         task = sliceChanges.newTask ?: task,
         description = sliceChanges.newDescription ?: description,
-        intervals = if (newStartInstant != startInstant)
+        intervals = if (newStartInstant != startInstant) {
+            val initialIntervals = intervals.filter { !it.isArtificial }
             listOf(
                 ClosedTimeInterval(
                     startInstant = newStartInstant,
-                    finishInstant = startInstant
+                    finishInstant = initialIntervals.first().startInstant,
+                    isArtificial = true,
                 )
-            ) + intervals
-        else intervals
+            ) + initialIntervals
+        } else intervals
     )
 }

@@ -17,7 +17,7 @@ data class RunningSlice(
     }
 
     val startInstant: Instant
-        get() = intervals.minOf { it.startInstant }
+        get() = intervals.first().startInstant
 
     fun countCurrentFinishInstant(): Instant =
         startInstant + countCurrentDuration()
