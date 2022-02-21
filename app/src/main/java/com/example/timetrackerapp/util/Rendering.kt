@@ -48,9 +48,11 @@ fun Duration.renderDurationLive(): String =
         renderTimeComponents(hours, minutes, seconds)
     }
 
-fun Duration.renderDurationFinished(): String =
-    toComponents { hours, minutes, seconds, _ ->
-        if (hours == 0L && minutes == 0) "${seconds}s"
-        else if (hours == 0L) "${minutes}m"
-        else "${hours}h ${minutes}m"
+fun Duration.renderDurationFinished(): String {
+    val sign = if (this.isNegative()) "-" else ""
+    return toComponents { hours, minutes, seconds, _ ->
+        if (hours == 0L && minutes == 0) "$sign${seconds.absoluteValue}s"
+        else if (hours == 0L) "$sign${minutes.absoluteValue}m"
+        else "$sign ${hours.absoluteValue}h ${minutes.absoluteValue}m"
     }
+}
