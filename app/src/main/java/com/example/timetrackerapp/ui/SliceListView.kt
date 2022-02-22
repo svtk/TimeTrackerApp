@@ -10,15 +10,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayCircle
+import androidx.compose.material.icons.filled.PlayCircleOutline
 import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.timetrackerapp.model.*
+import com.example.timetrackerapp.model.Description
+import com.example.timetrackerapp.model.Project
+import com.example.timetrackerapp.model.Task
+import com.example.timetrackerapp.model.WorkSlice
 import com.example.timetrackerapp.ui.theme.TimeTrackerAppTheme
 import com.example.timetrackerapp.util.renderDuration
 import com.example.timetrackerapp.util.renderTime
@@ -33,7 +36,9 @@ fun SliceListView(
     onCardClicked: (id: UUID) -> Unit,
     onSimilarSliceStarted: (id: UUID) -> Unit,
 ) {
-    LazyColumn(modifier = Modifier.padding(8.dp)) {
+    LazyColumn(
+        modifier = Modifier.padding(8.dp)
+    ) {
         items(slices) { slice ->
             SliceCard(
                 slice = slice,
@@ -55,20 +60,21 @@ fun SliceCard(
     onFinishClicked: (id: UUID) -> Unit,
 ) {
     Card(
-        modifier = Modifier.padding(4.dp),
+        modifier = Modifier.padding(start = 12.dp, top = 8.dp, end = 12.dp, bottom = 8.dp),
         elevation = 4.dp,
     ) {
-        Row {
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Column(
-                modifier =
-                Modifier
-                    .padding(start = 8.dp, top = 4.dp, end = 8.dp, bottom = 4.dp)
+                modifier = Modifier
+                    .padding(start = 12.dp, top = 4.dp, end = 12.dp, bottom = 4.dp)
                     .clickable(onClick = { onCardClicked(slice.id) })
                     .fillMaxWidth(0.8f)
             ) {
                 Row {
                     Text(
-                        modifier = Modifier.fillMaxWidth(0.5f),
+                        modifier = Modifier.fillMaxWidth(0.6f),
                         style = MaterialTheme.typography.body1,
                         overflow = TextOverflow.Ellipsis,
                         softWrap = false,
@@ -86,7 +92,7 @@ fun SliceCard(
                 }
                 Row {
                     Text(
-                        modifier = Modifier.fillMaxWidth(0.5f),
+                        modifier = Modifier.fillMaxWidth(0.6f),
                         style = MaterialTheme.typography.caption,
                         overflow = TextOverflow.Ellipsis,
                         softWrap = false,
@@ -111,6 +117,7 @@ fun SliceCard(
                         Icon(
                             imageVector = Icons.Filled.StopCircle,
                             contentDescription = "Finish",
+                            tint = MaterialTheme.colors.primary,
                         )
                     }
                 }
@@ -119,15 +126,16 @@ fun SliceCard(
                         Icon(
                             imageVector = Icons.Filled.PlayCircle,
                             contentDescription = "Resume",
+                            tint = MaterialTheme.colors.primary,
                         )
                     }
                 }
                 WorkSlice.State.FINISHED -> {
                     IconButton(onClick = { onStartClicked(slice.id) }) {
                         Icon(
-                            imageVector = Icons.Filled.PlayCircle,
+                            imageVector = Icons.Filled.PlayCircleOutline,
                             contentDescription = "Start",
-                            tint = Color.Gray,
+                            tint = MaterialTheme.colors.onBackground.copy(alpha = 0.4f),
                         )
                     }
                 }
@@ -144,6 +152,21 @@ fun SliceListPreview() {
             slices = createTestSlices(),
             onCardClicked = {},
             onSimilarSliceStarted = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SliceCard() {
+    TimeTrackerAppTheme {
+        val slice = createTestSlices().first()
+        SliceCard(
+            slice = slice,
+            duration = slice.duration,
+            onCardClicked = {},
+            onStartClicked = {},
+            onFinishClicked = {},
         )
     }
 }

@@ -1,17 +1,18 @@
 package com.example.timetrackerapp.ui
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PauseCircle
+import androidx.compose.material.icons.filled.PlayCircle
+import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,77 +35,89 @@ fun SliceDetailedView(
     runningSliceUpdates: RunningSliceUpdates,
     onBackClicked: () -> Unit,
 ) {
-    Column(Modifier.padding(8.dp)) {
-        SliceItem(
-            "Description", slice.description.value, sliceInfoUpdates.onDescriptionChanged
-        )
-        SliceItem(
-            "Project", slice.project.value, sliceInfoUpdates.onProjectChanged
-        )
-        SliceItem(
-            "Task", slice.task.value, sliceInfoUpdates.onTaskChanged
-        )
-        DateTimeFields(
-            slice.startInstant, "Start date", "Start time",
-            sliceInfoUpdates.onStartDateChange, sliceInfoUpdates.onStartTimeChange,
-        )
-        if (slice.state == WorkSlice.State.FINISHED) {
+    Card(Modifier.padding(12.dp)) {
+        Column(Modifier.padding(12.dp)) {
             SliceItem(
-                "Duration",
-                slice.duration.renderDurationFinished(),
-                onValueChange = { value -> Duration.parseOrNull(value)?.let(sliceInfoUpdates.onDurationChange) }
+                "Description", slice.description.value, sliceInfoUpdates.onDescriptionChanged,
+                colors = TextFieldDefaults.changeBorderColor(),
             )
-        } else {
-            Text(
-                text = slice.duration.renderDurationLive(),
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 20.dp, bottom = 20.dp),
-                style = MaterialTheme.typography.h4.copy(fontWeight = FontWeight.Bold),
+            SliceItem(
+                "Project", slice.project.value, sliceInfoUpdates.onProjectChanged,
             )
-        }
-        if (slice.state == WorkSlice.State.FINISHED) {
+            SliceItem(
+                "Task", slice.task.value, sliceInfoUpdates.onTaskChanged,
+                colors = TextFieldDefaults.changeBorderColor(),
+            )
             DateTimeFields(
-                slice.finishInstant, "End date", "End time",
-                sliceInfoUpdates.onFinishDateChange, sliceInfoUpdates.onFinishTimeChange,
+                slice.startInstant, "Start date", "Start time",
+                sliceInfoUpdates.onStartDateChange, sliceInfoUpdates.onStartTimeChange,
             )
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            when (slice.state) {
-                WorkSlice.State.PAUSED -> {
-                    TwoButtons(
-                        leftTitle = "RESUME",
-                        rightTitle = "FINISH",
-                        onLeftClicked = runningSliceUpdates.onResumeClicked,
-                        onRightClicked = runningSliceUpdates.onFinishClicked
+            if (slice.state == WorkSlice.State.FINISHED) {
+                SliceItem(
+                    "Duration",
+                    slice.duration.renderDurationFinished(),
+                    onValueChange = { value ->
+                        Duration.parseOrNull(value)?.let(sliceInfoUpdates.onDurationChange)
+                    }
+                )
+            } else {
+                Text(
+                    text = slice.duration.renderDurationLive(),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp, bottom = 20.dp),
+                    style = MaterialTheme.typography.h4.copy(fontWeight = FontWeight.Bold),
+                )
+            }
+            if (slice.state == WorkSlice.State.FINISHED) {
+                DateTimeFields(
+                    slice.finishInstant, "End date", "End time",
+                    sliceInfoUpdates.onFinishDateChange, sliceInfoUpdates.onFinishTimeChange,
+                )
+            }
+            if (slice.state != WorkSlice.State.FINISHED) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    if (slice.state == WorkSlice.State.PAUSED)
+                        ActionButton(
+                            modifier = Modifier.fillMaxWidth(0.5f),
+                            contentDescription = "Resume",
+                            imageVector = Icons.Filled.PlayCircle,
+                            color = MaterialTheme.colors.secondary,
+                            onClick = runningSliceUpdates.onResumeClicked
+                        )
+                    else
+                        ActionButton(
+                            modifier = Modifier.fillMaxWidth(0.5f),
+                            contentDescription = "Pause",
+                            imageVector = Icons.Filled.PauseCircle,
+                            color = MaterialTheme.colors.secondary,
+                            onClick = runningSliceUpdates.onPauseClicked
+                        )
+                    ActionButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentDescription = "Finish",
+                        imageVector = Icons.Filled.StopCircle,
+                        color = MaterialTheme.colors.primary,
+                        onClick = runningSliceUpdates.onFinishClicked
                     )
                 }
-                WorkSlice.State.RUNNING -> {
-                    TwoButtons(
-                        leftTitle = "PAUSE",
-                        rightTitle = "FINISH",
-                        onLeftClicked = runningSliceUpdates.onPauseClicked,
-                        onRightClicked = runningSliceUpdates.onFinishClicked
-                    )
+            }
+            Row {
+                OutlinedButton(
+                    onClick = onBackClicked,
+                    modifier = Modifier.padding(top = 20.dp)
+                ) {
+                    Text("BACK")
                 }
-                WorkSlice.State.FINISHED -> {}
-            }
-        }
-        Row {
-            OutlinedButton(
-                onClick = onBackClicked,
-                modifier = Modifier.padding(top = 20.dp)
-            ) {
-                Text("BACK")
-            }
-            OutlinedButton(
-                onClick = sliceInfoUpdates.onSave,
-                modifier = Modifier.padding(top = 20.dp)
-            ) {
-                Text("SAVE")
+                OutlinedButton(
+                    onClick = sliceInfoUpdates.onSave,
+                    modifier = Modifier.padding(top = 20.dp)
+                ) {
+                    Text("SAVE")
+                }
             }
         }
     }
@@ -114,13 +127,15 @@ fun SliceDetailedView(
 private fun SliceItem(
     label: String,
     value: String,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors(),
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         modifier = Modifier.fillMaxWidth(),
-        label = { Text(label) }
+        label = { Text(label) },
+        colors = colors,
     )
 }
 
@@ -153,8 +168,7 @@ private fun DateTimeFields(
             modifier = Modifier
                 .fillMaxWidth(0.5f)
                 .padding(end = 4.dp)
-                .clickable(onClick = { dateDialogState.show() })
-            ,
+                .clickable(onClick = { dateDialogState.show() }),
             readOnly = true,
             enabled = false,
             label = { Text(dateLabel) }
@@ -165,8 +179,7 @@ private fun DateTimeFields(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 4.dp)
-                .clickable(onClick = { timeDialogState.show() })
-            ,
+                .clickable(onClick = { timeDialogState.show() }),
             readOnly = true,
             enabled = false,
             label = { Text(timeLabel) }
@@ -175,34 +188,22 @@ private fun DateTimeFields(
 }
 
 @Composable
-private fun TwoButtons(
-    leftTitle: String,
-    rightTitle: String,
-    onLeftClicked: () -> Unit,
-    onRightClicked: () -> Unit
+private fun ActionButton(
+    modifier: Modifier,
+    contentDescription: String,
+    imageVector: ImageVector,
+    color: Color,
+    onClick: () -> Unit,
 ) {
-    val textModifier = Modifier
-        .padding(top = 16.dp, bottom = 16.dp)
-    OutlinedButton(
-        modifier = Modifier
-            .fillMaxWidth(0.5f)
-            .padding(end = 4.dp),
-        onClick = onLeftClicked,
+    IconButton(
+        onClick = onClick,
+        modifier = modifier,
     ) {
-        Text(
-            text = leftTitle,
-            modifier = textModifier
-        )
-    }
-    OutlinedButton(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 4.dp),
-        onClick = onRightClicked
-    ) {
-        Text(
-            text = rightTitle,
-            modifier = textModifier
+        Icon(
+            imageVector = imageVector,
+            contentDescription = contentDescription,
+            modifier = Modifier.size(96.dp),
+            tint = color,
         )
     }
 }
@@ -230,6 +231,11 @@ fun FinishedSliceDetailedViewPreview() {
 }
 
 @Preview(showBackground = true)
+@Preview(
+    showBackground = true,
+    uiMode = UI_MODE_NIGHT_YES,
+    name = "DetailedViewPreviewDark"
+)
 @Composable
 fun RunningSliceDetailedViewPreview() {
     TimeTrackerAppTheme {

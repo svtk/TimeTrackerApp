@@ -1,10 +1,8 @@
 package com.example.timetrackerapp.ui
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.runtime.Composable
@@ -19,6 +17,7 @@ import com.example.timetrackerapp.model.Project
 import com.example.timetrackerapp.model.Task
 import com.example.timetrackerapp.model.WorkSlice
 import com.example.timetrackerapp.ui.theme.TimeTrackerAppTheme
+import com.example.timetrackerapp.util.changeBorderColor
 import com.example.timetrackerapp.util.testInstant
 import java.util.*
 import kotlin.time.Duration.Companion.minutes
@@ -94,24 +93,29 @@ fun StartingNewSlice(
     onDescriptionUpdate: (String) -> Unit,
     onNewSlice: () -> Unit
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(4.dp),
-    ) {
-        OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(0.8f),
-            value = description,
-            onValueChange = { onDescriptionUpdate(it) },
-            label = { Text("I'm working on...") },
-        )
-        IconButton(
-            onClick = onNewSlice,
-            modifier = Modifier.fillMaxWidth(),
+    Card(Modifier.padding(12.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(12.dp),
         ) {
-            Icon(
-                imageVector = Icons.Filled.PlayCircle,
-                contentDescription = "Start"
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(0.8f),
+                value = description,
+                onValueChange = { onDescriptionUpdate(it) },
+                label = { Text("I'm working on...") },
+                colors = TextFieldDefaults.changeBorderColor(),
             )
+            IconButton(
+                onClick = onNewSlice,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.PlayCircle,
+                    contentDescription = "Start",
+                    modifier = Modifier.size(48.dp),
+                    tint = MaterialTheme.colors.secondary,
+                )
+            }
         }
     }
 }
@@ -121,45 +125,58 @@ fun StartingNewSlice(
 @Composable
 fun MainScreenRunningTaskPreview() {
     TimeTrackerAppTheme {
-        MainView(
-            slice = WorkSlice(
-                UUID.randomUUID(),
-                Project("my Project"),
-                Task("my Task"),
-                Description("my description"),
-                startInstant = testInstant("2022-01-26T11:30"),
-                finishInstant = testInstant("2022-01-26T13:00"),
-                duration = 50.minutes,
-                state = WorkSlice.State.PAUSED,
-            ),
-            finishedSlices = createTestSlices(),
-            currentDescription = "",
-            onDescriptionUpdate = {},
-            onNewSlice = {},
-            onCardClicked = {},
-            onSimilarSliceStarted = {},
-            onCurrentSliceClicked = {},
-            onCurrentSliceResumed = {},
-            onCurrentSliceFinished = {},
-        )
+        Surface(
+            color = MaterialTheme.colors.background
+        ) {
+            MainView(
+                slice = WorkSlice(
+                    UUID.randomUUID(),
+                    Project("my Project"),
+                    Task("my Task"),
+                    Description("my description"),
+                    startInstant = testInstant("2022-01-26T11:30"),
+                    finishInstant = testInstant("2022-01-26T13:00"),
+                    duration = 50.minutes,
+                    state = WorkSlice.State.PAUSED,
+                ),
+                finishedSlices = createTestSlices(),
+                currentDescription = "",
+                onDescriptionUpdate = {},
+                onNewSlice = {},
+                onCardClicked = {},
+                onSimilarSliceStarted = {},
+                onCurrentSliceClicked = {},
+                onCurrentSliceResumed = {},
+                onCurrentSliceFinished = {},
+            )
+        }
     }
 }
 
 @Preview(showBackground = true)
+@Preview(
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "MainScreenChoosingTaskPreviewDark"
+)
 @Composable
 fun MainScreenChoosingTaskPreview() {
     TimeTrackerAppTheme {
-        MainView(
-            slice = null,
-            finishedSlices = createTestSlices(),
-            currentDescription = "",
-            onDescriptionUpdate = {},
-            onNewSlice = {},
-            onCardClicked = {},
-            onSimilarSliceStarted = {},
-            onCurrentSliceClicked = {},
-            onCurrentSliceResumed = {},
-            onCurrentSliceFinished = {},
-        )
+        Surface(
+            color = MaterialTheme.colors.background
+        ) {
+            MainView(
+                slice = null,
+                finishedSlices = createTestSlices(),
+                currentDescription = "",
+                onDescriptionUpdate = {},
+                onNewSlice = {},
+                onCardClicked = {},
+                onSimilarSliceStarted = {},
+                onCurrentSliceClicked = {},
+                onCurrentSliceResumed = {},
+                onCurrentSliceFinished = {},
+            )
+        }
     }
 }
