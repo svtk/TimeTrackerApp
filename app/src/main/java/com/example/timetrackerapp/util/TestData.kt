@@ -1,20 +1,46 @@
 package com.example.timetrackerapp.util
 
-import com.example.timetrackerapp.model.ClosedTimeInterval
+import com.example.timetrackerapp.model.*
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
-import kotlin.time.Duration
+import java.util.*
 import kotlin.time.Duration.Companion.minutes
 
-fun testTimeIntervals() = listOf(
-    testTimeInterval("2022-01-26T11:30", 20.minutes),
-    testTimeInterval("2022-01-26T13:00", 30.minutes),
+fun createTestInstant(isoDate: String) = LocalDateTime.parse(isoDate).toInstant(
+    TimeZone.currentSystemDefault()
 )
 
-fun testTimeInterval(isoDate: String, duration: Duration) =
-    ClosedTimeInterval(testInstant(isoDate), duration)
+fun createTestSlices() = listOf(
+    WorkSlice(
+        id = UUID.randomUUID(),
+        project = Project("project 1"),
+        task = Task("task 1"),
+        description = Description("short description"),
+        startInstant = createTestInstant("2022-01-05T10:00"),
+        finishInstant = createTestInstant("2022-01-05T10:20"),
+        duration = 25.minutes,
+        state = WorkSlice.State.FINISHED,
+    ),
+    WorkSlice(
+        id = UUID.randomUUID(),
+        project = Project("project 2 - it should be a very long title"),
+        task = Task("task 2 - also a long title"),
+        description = Description("the description is soo long that it doesn't fit in one line"),
+        startInstant = createTestInstant("2022-01-26T11:30"),
+        finishInstant = createTestInstant("2022-01-26T13:00"),
+        duration = 50.minutes,
+        state = WorkSlice.State.FINISHED,
+    ),
+)
 
-fun testInstant(isoDate: String) = LocalDateTime.parse(isoDate).toInstant(
-    TimeZone.currentSystemDefault()
+fun createTestRunningSlice() = WorkSlice(
+    id = UUID.randomUUID(),
+    project = Project("project 1"),
+    task = Task("task 1"),
+    description = Description("short description"),
+    startInstant = createTestInstant("2022-01-05T10:00"),
+    finishInstant = createTestInstant("2022-01-05T10:20"),
+    duration = 25.minutes,
+    state = WorkSlice.State.RUNNING,
 )

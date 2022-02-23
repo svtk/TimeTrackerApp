@@ -17,8 +17,7 @@ import com.example.timetrackerapp.model.Project
 import com.example.timetrackerapp.model.Task
 import com.example.timetrackerapp.model.WorkSlice
 import com.example.timetrackerapp.ui.theme.TimeTrackerAppTheme
-import com.example.timetrackerapp.util.changeBorderColor
-import com.example.timetrackerapp.util.testInstant
+import com.example.timetrackerapp.util.*
 import java.util.*
 import kotlin.time.Duration.Companion.minutes
 
@@ -29,8 +28,7 @@ fun MainView(
     navigateToChosenSlice: (UUID) -> Unit,
 ) {
     val finishedSlices by homeViewModel.finishedSlices.collectAsState()
-    val runningSlice by homeViewModel.
-    runningSlice.collectAsState(null)
+    val runningSlice by homeViewModel.runningSlice.collectAsState(null)
     MainView(
         slice = runningSlice,
         finishedSlices = finishedSlices,
@@ -70,12 +68,12 @@ fun MainView(
                     onNewSlice = onNewSlice
                 )
             } else {
-                SliceCard(
+                RunningSliceCard(
                     slice = slice,
                     duration = slice.duration,
-                    onCardClicked = { onCurrentSliceClicked() },
-                    onStartClicked = { onCurrentSliceResumed() },
-                    onFinishClicked = { onCurrentSliceFinished() },
+                    onCardClicked = onCurrentSliceClicked,
+                    onResumeClicked = onCurrentSliceResumed,
+                    onFinishClicked = onCurrentSliceFinished,
                 )
             }
         }
@@ -120,7 +118,6 @@ fun StartingNewSlice(
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 fun MainScreenRunningTaskPreview() {
@@ -134,10 +131,10 @@ fun MainScreenRunningTaskPreview() {
                     Project("my Project"),
                     Task("my Task"),
                     Description("my description"),
-                    startInstant = testInstant("2022-01-26T11:30"),
-                    finishInstant = testInstant("2022-01-26T13:00"),
+                    startInstant = createTestInstant("2022-01-26T11:30"),
+                    finishInstant = createTestInstant("2022-01-26T13:00"),
                     duration = 50.minutes,
-                    state = WorkSlice.State.PAUSED,
+                    state = WorkSlice.State.RUNNING,
                 ),
                 finishedSlices = createTestSlices(),
                 currentDescription = "",

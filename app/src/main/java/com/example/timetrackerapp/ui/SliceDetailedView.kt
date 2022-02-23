@@ -11,8 +11,6 @@ import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -80,12 +78,14 @@ fun SliceDetailedView(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
+                    val size = 96.dp
                     if (slice.state == WorkSlice.State.PAUSED)
                         ActionButton(
                             modifier = Modifier.fillMaxWidth(0.5f),
                             contentDescription = "Resume",
                             imageVector = Icons.Filled.PlayCircle,
                             color = MaterialTheme.colors.secondary,
+                            size = size,
                             onClick = runningSliceUpdates.onResumeClicked
                         )
                     else
@@ -94,6 +94,7 @@ fun SliceDetailedView(
                             contentDescription = "Pause",
                             imageVector = Icons.Filled.PauseCircle,
                             color = MaterialTheme.colors.secondary,
+                            size = size,
                             onClick = runningSliceUpdates.onPauseClicked
                         )
                     ActionButton(
@@ -101,6 +102,7 @@ fun SliceDetailedView(
                         contentDescription = "Finish",
                         imageVector = Icons.Filled.StopCircle,
                         color = MaterialTheme.colors.primary,
+                        size = size,
                         onClick = runningSliceUpdates.onFinishClicked
                     )
                 }
@@ -187,27 +189,6 @@ private fun DateTimeFields(
     }
 }
 
-@Composable
-private fun ActionButton(
-    modifier: Modifier,
-    contentDescription: String,
-    imageVector: ImageVector,
-    color: Color,
-    onClick: () -> Unit,
-) {
-    IconButton(
-        onClick = onClick,
-        modifier = modifier,
-    ) {
-        Icon(
-            imageVector = imageVector,
-            contentDescription = contentDescription,
-            modifier = Modifier.size(96.dp),
-            tint = color,
-        )
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun FinishedSliceDetailedViewPreview() {
@@ -218,8 +199,8 @@ fun FinishedSliceDetailedViewPreview() {
                 project = Project("my project"),
                 task = Task("my task"),
                 description = Description("my work"),
-                startInstant = testInstant("2022-01-26T11:30"),
-                finishInstant = testInstant("2022-01-26T13:00"),
+                startInstant = createTestInstant("2022-01-26T11:30"),
+                finishInstant = createTestInstant("2022-01-26T13:00"),
                 duration = 1.hours,
                 state = WorkSlice.State.FINISHED,
             ),
@@ -245,8 +226,8 @@ fun RunningSliceDetailedViewPreview() {
                 project = Project("my project"),
                 task = Task("my task"),
                 description = Description("my work"),
-                startInstant = testInstant("2022-01-26T11:30"),
-                finishInstant = testInstant("2022-01-26T13:00"),
+                startInstant = createTestInstant("2022-01-26T11:30"),
+                finishInstant = createTestInstant("2022-01-26T13:00"),
                 duration = 50.minutes,
                 state = WorkSlice.State.PAUSED,
             ),

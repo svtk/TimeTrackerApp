@@ -1,34 +1,25 @@
 package com.example.timetrackerapp.ui
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayCircle
-import androidx.compose.material.icons.filled.PlayCircleOutline
-import androidx.compose.material.icons.filled.StopCircle
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.timetrackerapp.model.Description
-import com.example.timetrackerapp.model.Project
-import com.example.timetrackerapp.model.Task
 import com.example.timetrackerapp.model.WorkSlice
 import com.example.timetrackerapp.ui.theme.TimeTrackerAppTheme
+import com.example.timetrackerapp.util.createTestSlices
 import com.example.timetrackerapp.util.renderDuration
 import com.example.timetrackerapp.util.renderTime
-import com.example.timetrackerapp.util.testInstant
 import java.util.*
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
 
 @Composable
 fun SliceListView(
@@ -45,7 +36,6 @@ fun SliceListView(
                 duration = slice.duration,
                 onCardClicked = onCardClicked,
                 onStartClicked = onSimilarSliceStarted,
-                onFinishClicked = { },
             )
         }
     }
@@ -57,88 +47,50 @@ fun SliceCard(
     duration: Duration,
     onCardClicked: (id: UUID) -> Unit,
     onStartClicked: (id: UUID) -> Unit,
-    onFinishClicked: (id: UUID) -> Unit,
 ) {
     Card(
-        modifier = Modifier.padding(start = 12.dp, top = 8.dp, end = 12.dp, bottom = 8.dp),
+        modifier = Modifier
+            .padding(start = 12.dp, top = 8.dp, end = 12.dp, bottom = 8.dp)
+            .fillMaxWidth(),
         elevation = 4.dp,
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.padding(start = 12.dp, top = 4.dp, end = 12.dp, bottom = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(
                 modifier = Modifier
-                    .padding(start = 12.dp, top = 4.dp, end = 12.dp, bottom = 4.dp)
                     .clickable(onClick = { onCardClicked(slice.id) })
                     .fillMaxWidth(0.8f)
             ) {
                 Row {
                     Text(
                         modifier = Modifier.fillMaxWidth(0.6f),
-                        style = MaterialTheme.typography.body1,
-                        overflow = TextOverflow.Ellipsis,
-                        softWrap = false,
-                        text = if (slice.project.value.isNotEmpty())
-                            slice.project.value +
-                                    if (slice.task.value.isNotEmpty()) ": ${slice.task.value}" else ""
-                        else "(no project)",
+                        style = MaterialTheme.typography.h6,
+                        text = "${slice.startInstant.renderTime()} - ${slice.finishInstant.renderTime()}",
                     )
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.End,
-                        style = MaterialTheme.typography.body1,
+                        style = MaterialTheme.typography.h6,
                         text = duration.renderDuration(slice.state),
                     )
                 }
-                Row {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(0.6f),
-                        style = MaterialTheme.typography.caption,
-                        overflow = TextOverflow.Ellipsis,
-                        softWrap = false,
-                        text = slice.description.value,
-                    )
-                    val finishTimeText =
-                        if (slice.state == WorkSlice.State.FINISHED)
-                            slice.finishInstant.renderTime()
-                        else
-                            "..."
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.End,
-                        style = MaterialTheme.typography.caption,
-                        text = "${slice.startInstant.renderTime()} - $finishTimeText",
-                    )
+                DescriptionText(slice)
+                if (slice.project.value.isNotEmpty()) {
+                    ProjectText(slice)
                 }
             }
-            when (slice.state) {
-                WorkSlice.State.RUNNING -> {
-                    IconButton(onClick = { onFinishClicked(slice.id) }) {
-                        Icon(
-                            imageVector = Icons.Filled.StopCircle,
-                            contentDescription = "Finish",
-                            tint = MaterialTheme.colors.primary,
-                        )
-                    }
-                }
-                WorkSlice.State.PAUSED -> {
-                    IconButton(onClick = { onStartClicked(slice.id) }) {
-                        Icon(
-                            imageVector = Icons.Filled.PlayCircle,
-                            contentDescription = "Resume",
-                            tint = MaterialTheme.colors.primary,
-                        )
-                    }
-                }
-                WorkSlice.State.FINISHED -> {
-                    IconButton(onClick = { onStartClicked(slice.id) }) {
-                        Icon(
-                            imageVector = Icons.Filled.PlayCircleOutline,
-                            contentDescription = "Start",
-                            tint = MaterialTheme.colors.onBackground.copy(alpha = 0.4f),
-                        )
-                    }
-                }
+            IconButton(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { onStartClicked(slice.id) }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.PlayArrow,
+                    modifier = Modifier.size(32.dp),
+                    contentDescription = "Start",
+                    tint = MaterialTheme.colors.onBackground.copy(alpha = 0.4f),
+                )
             }
         }
     }
@@ -158,7 +110,7 @@ fun SliceListPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun SliceCard() {
+fun SliceCardPreview() {
     TimeTrackerAppTheme {
         val slice = createTestSlices().first()
         SliceCard(
@@ -166,30 +118,6 @@ fun SliceCard() {
             duration = slice.duration,
             onCardClicked = {},
             onStartClicked = {},
-            onFinishClicked = {},
         )
     }
 }
-
-fun createTestSlices() = listOf(
-    WorkSlice(
-        id = UUID.randomUUID(),
-        project = Project("project 1"),
-        task = Task("task 1"),
-        description = Description("short description"),
-        startInstant = testInstant("2022-01-05T10:00"),
-        finishInstant = testInstant("2022-01-05T10:20"),
-        duration = 25.minutes,
-        state = WorkSlice.State.FINISHED,
-    ),
-    WorkSlice(
-        id = UUID.randomUUID(),
-        project = Project("project 2 - very long title"),
-        task = Task("task 2 - also long"),
-        description = Description("very long second description"),
-        startInstant = testInstant("2022-01-26T11:30"),
-        finishInstant = testInstant("2022-01-26T13:00"),
-        duration = 50.minutes,
-        state = WorkSlice.State.FINISHED,
-    ),
-)
