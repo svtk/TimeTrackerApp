@@ -1,7 +1,6 @@
 package com.example.timetrackerapp.ui
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -164,27 +163,21 @@ private fun DateTimeFields(
     )
 
     Row {
-        OutlinedTextField(
+        ClickableReadOnlyTextField(
             value = time.renderDate(),
-            onValueChange = { },
             modifier = Modifier
                 .fillMaxWidth(0.5f)
-                .padding(end = 4.dp)
-                .clickable(onClick = { dateDialogState.show() }),
-            readOnly = true,
-            enabled = false,
-            label = { Text(dateLabel) }
+                .padding(end = 4.dp),
+            label = { Text(dateLabel) },
+            onClick = { dateDialogState.show() }
         )
-        OutlinedTextField(
-            value = time.renderTime(),
-            onValueChange = { },
+        ClickableReadOnlyTextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 4.dp)
-                .clickable(onClick = { timeDialogState.show() }),
-            readOnly = true,
-            enabled = false,
-            label = { Text(timeLabel) }
+                .padding(start = 4.dp),
+            value = time.renderTime(),
+            label = { Text(timeLabel) },
+            onClick = { timeDialogState.show() }
         )
     }
 }
