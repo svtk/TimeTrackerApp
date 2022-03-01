@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -75,13 +76,15 @@ fun RunningSliceCard(
 
 @Composable
 fun ProjectText(slice: WorkSlice) {
-    Text(
-        style = MaterialTheme.typography.caption,
-        overflow = TextOverflow.Ellipsis,
-        softWrap = false,
-        text = slice.project.value +
-                if (slice.task.value.isNotEmpty()) ": ${slice.task.value}" else ""
-    )
+    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+        Text(
+            style = MaterialTheme.typography.caption,
+            overflow = TextOverflow.Ellipsis,
+            softWrap = false,
+            text = slice.project.value +
+                    if (slice.task.value.isNotEmpty()) ": ${slice.task.value}" else ""
+        )
+    }
 }
 
 @Composable
