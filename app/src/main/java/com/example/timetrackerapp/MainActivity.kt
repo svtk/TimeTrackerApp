@@ -23,9 +23,9 @@ class MainActivity : ComponentActivity() {
                     topBar = {
                         TopAppBar(title = { Text("Time Tracker") })
                     },
-                ) {
+                ) { innerPadding ->
                     Surface(
-                        modifier = Modifier.padding(it),
+                        modifier = Modifier.padding(innerPadding),
                         color = MaterialTheme.colors.background
                     ) {
                         Navigation(repository)

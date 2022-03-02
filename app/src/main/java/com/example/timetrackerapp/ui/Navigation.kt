@@ -1,43 +1,61 @@
 package com.example.timetrackerapp.ui
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.timetrackerapp.data.SlicesRepository
-import com.example.timetrackerapp.ui.UIState.*
 import java.util.*
 
-enum class UIState {
-    HOME, RUNNING_SLICE, FINISHED_SLICE
+enum class TimeTrackerScreen {
+    Home, RunningSlice, ViewSlice
 }
 
 @Composable
 fun Navigation(
     repository: SlicesRepository,
 ) {
-    var uiState by remember { mutableStateOf(HOME) }
-    var chosenSliceId by remember { mutableStateOf<UUID?>(null)}
-    when (uiState) {
-        RUNNING_SLICE -> RunningSliceView(
-            runningSliceViewModel = viewModel(
-                factory = RunningSliceViewModel.provideFactory(
-                    repository
-                )
-            ),
-            navigateToHome = { uiState = HOME },
-        )
-        FINISHED_SLICE -> FinishedSliceView(
-            id = chosenSliceId!!,
-            finishedSliceViewModel = viewModel(
-                factory = FinishedSliceViewModel.provideFactory(
-                    repository
-                )
-            ),
-            navigateToHome = { uiState = HOME },
-        )
-        HOME -> MainView(
-            homeViewModel = viewModel(factory = HomeViewModel.provideFactory(repository)),
-            navigateToRunningSlice = { uiState = RUNNING_SLICE },
-            navigateToChosenSlice = { id -> chosenSliceId = id; uiState = FINISHED_SLICE },
-        )
+    val navController = rememberNavController()
+    NavHost(
+        navController = navController,
+        startDestination = TimeTrackerScreen.Home.name,
+    ) {
+        composable(TimeTrackerScreen.Home.name) {
+            MainView(
+                homeViewModel = viewModel(factory = HomeViewModel.provideFactory(repository)),
+                navigateToRunningSlice = { navController.navigate(TimeTrackerScreen.RunningSlice.name) },
+                navigateToChosenSlice = { id -> navController.navigate("${TimeTrackerScreen.ViewSlice.name}/$id") },
+            )
+        }
+        composable(TimeTrackerScreen.RunningSlice.name) {
+            RunningSliceView(
+                runningSliceViewModel = viewModel(
+                    factory = RunningSliceViewModel.provideFactory(
+                        repository
+                    )
+                ),
+                navigateToHome = { navController.navigate(TimeTrackerScreen.Home.name) },
+            )
+        }
+        composable(
+            route = "${TimeTrackerScreen.ViewSlice.name}/{id}",
+            arguments = listOf(
+                navArgument("id") { type = NavType.StringType }
+            )
+        ) { entry ->
+            val sliceId = UUID.fromString(entry.arguments?.get("id") as String)
+            FinishedSliceView(
+                id = sliceId,
+                finishedSliceViewModel = viewModel(
+                    factory = FinishedSliceViewModel.provideFactory(
+                        repository
+                    )
+                ),
+                navigateToHome = { navController.navigate(TimeTrackerScreen.Home.name) },
+            )
+        }
     }
 }
