@@ -30,7 +30,6 @@ fun SliceDetailedView(
     slice: WorkSlice,
     sliceInfoUpdates: SliceInfoUpdates,
     runningSliceUpdates: RunningSliceUpdates,
-    onBackClicked: () -> Unit,
 ) {
     Card(Modifier.padding(12.dp)) {
         Column(Modifier.padding(12.dp)) {
@@ -107,12 +106,6 @@ fun SliceDetailedView(
                 }
             }
             Row {
-                OutlinedButton(
-                    onClick = onBackClicked,
-                    modifier = Modifier.padding(top = 20.dp)
-                ) {
-                    Text("BACK")
-                }
                 OutlinedButton(
                     onClick = sliceInfoUpdates.onSave,
                     modifier = Modifier.padding(top = 20.dp)
@@ -199,7 +192,6 @@ fun FinishedSliceDetailedViewPreview() {
             ),
             sliceInfoUpdates = emptySliceInfoUpdates,
             runningSliceUpdates = emptyRunningSliceUpdates,
-            onBackClicked = {},
         )
     }
 }
@@ -226,7 +218,6 @@ fun RunningSliceDetailedViewPreview() {
             ),
             sliceInfoUpdates = emptySliceInfoUpdates,
             runningSliceUpdates = emptyRunningSliceUpdates,
-            onBackClicked = {},
         )
     }
 }

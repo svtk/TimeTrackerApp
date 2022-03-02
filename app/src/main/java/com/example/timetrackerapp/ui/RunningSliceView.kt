@@ -35,9 +35,5 @@ fun RunningSliceView(
                 navigateToHome()
             },
         ),
-        onBackClicked = {
-            navigateToHome()
-            runningSliceViewModel.onDiscard()
-        },
     )
 }

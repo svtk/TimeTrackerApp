@@ -7,7 +7,6 @@ import java.util.*
 fun FinishedSliceView(
     id: UUID,
     finishedSliceViewModel: FinishedSliceViewModel,
-    navigateToHome: () -> Unit,
 ) {
     finishedSliceViewModel.updateChosenSlice(id)
     if (finishedSliceViewModel.slice == null) {
@@ -28,10 +27,5 @@ fun FinishedSliceView(
             onSave = finishedSliceViewModel::onSave,
         ),
         runningSliceUpdates = emptyRunningSliceUpdates,
-        onBackClicked = {
-            navigateToHome()
-            finishedSliceViewModel.onDiscard()
-        },
     )
-
 }

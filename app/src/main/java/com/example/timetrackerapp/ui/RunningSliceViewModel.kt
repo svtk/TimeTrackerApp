@@ -44,10 +44,6 @@ class RunningSliceViewModel(
         sliceChanges = null
     }
 
-    fun onDiscard() {
-        sliceChanges = null
-    }
-
     fun onStartDateChanged(newDate: LocalDate) {
         recordChanges { copy(newStartDate = newDate) }
         onSave()

@@ -2,23 +2,33 @@ package com.example.timetrackerapp.ui
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.timetrackerapp.data.SlicesRepository
 import java.util.*
 
-enum class TimeTrackerScreen {
-    Home, RunningSlice, ViewSlice
+enum class TimeTrackerScreen(val title: String) {
+    Home("Time Tracker"), RunningSlice("Running Time Slice"), ViewSlice("Edit Time Slice");
+
+    companion object {
+        fun fromRoute(route: String?): TimeTrackerScreen =
+            when (route?.substringBefore("/")) {
+                Home.name, null -> Home
+                RunningSlice.name -> RunningSlice
+                ViewSlice.name -> ViewSlice
+                else -> throw IllegalArgumentException("Route $route is not recognized.")
+            }
+    }
 }
 
 @Composable
 fun Navigation(
     repository: SlicesRepository,
+    navController: NavHostController,
 ) {
-    val navController = rememberNavController()
     NavHost(
         navController = navController,
         startDestination = TimeTrackerScreen.Home.name,
@@ -54,7 +64,6 @@ fun Navigation(
                         repository
                     )
                 ),
-                navigateToHome = { navController.navigate(TimeTrackerScreen.Home.name) },
             )
         }
     }

@@ -52,10 +52,6 @@ class FinishedSliceViewModel(
         clearChosenSlice()
     }
 
-    fun onDiscard() {
-        clearChosenSlice()
-    }
-
     fun onProjectChanged(projectName: String) {
         recordChanges { copy(newProject = Project(projectName)) }
     }
