@@ -41,7 +41,7 @@ fun HomeView(
         onCardClicked = navigateToChosenSlice,
         onSimilarSliceStarted = homeViewModel::startSimilarSlice,
         onCurrentSliceClicked = navigateToRunningSlice,
-        onCurrentSliceResumed = {}, // TODO
+        onCurrentSliceResumed = homeViewModel::resumeRunningSlice,
         onCurrentSliceFinished = homeViewModel::finishRunningSlice,
     )
 }

@@ -77,6 +77,12 @@ class HomeViewModel(
         }
     }
 
+    fun resumeRunningSlice() {
+        viewModelScope.launch {
+            repository.changeRunningSliceState(WorkSlice.State.RUNNING)
+        }
+    }
+
     fun finishRunningSlice() {
         viewModelScope.launch {
             repository.finishRunningSlice()
