@@ -1,4 +1,4 @@
-package com.example.timetrackerapp.ui
+package com.example.timetrackerapp.ui.slice
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -8,6 +8,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.timetrackerapp.data.SlicesRepository
 import com.example.timetrackerapp.model.*
+import com.example.timetrackerapp.ui.util.TickHandler
+import com.example.timetrackerapp.ui.util.transformAndEmitRegularly
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -105,7 +107,7 @@ class RunningSliceViewModel(
 fun Flow<RunningSlice?>.convertToWorkSliceAndEmitEverySecond(
     scope: CoroutineScope,
     tickFlow: Flow<Unit>,
-) =
+): Flow<WorkSlice?> =
     transformAndEmitRegularly(
         scope = scope,
         tickFlow = tickFlow,

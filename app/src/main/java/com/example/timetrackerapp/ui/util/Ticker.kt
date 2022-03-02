@@ -1,4 +1,4 @@
-package com.example.timetrackerapp.ui
+package com.example.timetrackerapp.ui.util
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi

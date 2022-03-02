@@ -1,4 +1,4 @@
-package com.example.timetrackerapp.ui
+package com.example.timetrackerapp.ui.slice
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

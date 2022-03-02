@@ -1,4 +1,4 @@
-package com.example.timetrackerapp.ui
+package com.example.timetrackerapp.ui.home
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

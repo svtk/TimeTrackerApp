@@ -8,6 +8,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.timetrackerapp.data.SlicesRepository
+import com.example.timetrackerapp.ui.home.HomeView
+import com.example.timetrackerapp.ui.home.HomeViewModel
+import com.example.timetrackerapp.ui.slice.FinishedSliceView
+import com.example.timetrackerapp.ui.slice.FinishedSliceViewModel
+import com.example.timetrackerapp.ui.slice.RunningSliceView
+import com.example.timetrackerapp.ui.slice.RunningSliceViewModel
 import java.util.*
 
 enum class TimeTrackerScreen(val title: String) {
@@ -25,7 +31,7 @@ enum class TimeTrackerScreen(val title: String) {
 }
 
 @Composable
-fun Navigation(
+fun TimeTrackerNavHost(
     repository: SlicesRepository,
     navController: NavHostController,
 ) {
@@ -34,7 +40,7 @@ fun Navigation(
         startDestination = TimeTrackerScreen.Home.name,
     ) {
         composable(TimeTrackerScreen.Home.name) {
-            MainView(
+            HomeView(
                 homeViewModel = viewModel(factory = HomeViewModel.provideFactory(repository)),
                 navigateToRunningSlice = { navController.navigate(TimeTrackerScreen.RunningSlice.name) },
                 navigateToChosenSlice = { id -> navController.navigate("${TimeTrackerScreen.ViewSlice.name}/$id") },

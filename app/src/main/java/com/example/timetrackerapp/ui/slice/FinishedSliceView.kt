@@ -1,6 +1,7 @@
-package com.example.timetrackerapp.ui
+package com.example.timetrackerapp.ui.slice
 
 import androidx.compose.runtime.Composable
+import com.example.timetrackerapp.ui.util.LoadingView
 import java.util.*
 
 @Composable

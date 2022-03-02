@@ -1,8 +1,9 @@
-package com.example.timetrackerapp.ui
+package com.example.timetrackerapp.ui.slice
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.example.timetrackerapp.ui.util.LoadingView
 
 @Composable
 fun RunningSliceView(

@@ -1,4 +1,4 @@
-package com.example.timetrackerapp.ui
+package com.example.timetrackerapp.ui.slice
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime

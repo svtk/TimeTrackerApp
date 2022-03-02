@@ -1,4 +1,4 @@
-package com.example.timetrackerapp.ui
+package com.example.timetrackerapp.ui.home
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -7,8 +7,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.timetrackerapp.data.SlicesRepository
-import com.example.timetrackerapp.model.*
-import kotlinx.coroutines.flow.*
+import com.example.timetrackerapp.model.Description
+import com.example.timetrackerapp.model.Project
+import com.example.timetrackerapp.model.Task
+import com.example.timetrackerapp.model.WorkSlice
+import com.example.timetrackerapp.ui.slice.convertToWorkSliceAndEmitEverySecond
+import com.example.timetrackerapp.ui.util.TickHandler
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.time.Duration.Companion.seconds

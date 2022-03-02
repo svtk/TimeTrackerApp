@@ -1,4 +1,4 @@
-package com.example.timetrackerapp.ui
+package com.example.timetrackerapp.ui.home
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
@@ -22,14 +22,14 @@ import java.util.*
 import kotlin.time.Duration.Companion.minutes
 
 @Composable
-fun MainView(
+fun HomeView(
     homeViewModel: HomeViewModel,
     navigateToRunningSlice: () -> Unit,
     navigateToChosenSlice: (UUID) -> Unit,
 ) {
     val finishedSlices by homeViewModel.finishedSlices.collectAsState()
     val runningSlice by homeViewModel.runningSlice.collectAsState(null)
-    MainView(
+    HomeView(
         slice = runningSlice,
         finishedSlices = finishedSlices,
         currentDescription = homeViewModel.currentDescription,
@@ -47,7 +47,7 @@ fun MainView(
 }
 
 @Composable
-fun MainView(
+fun HomeView(
     slice: WorkSlice?,
     finishedSlices: List<WorkSlice>,
     currentDescription: String,
@@ -120,12 +120,12 @@ fun StartingNewSlice(
 
 @Preview(showBackground = true)
 @Composable
-fun MainScreenRunningTaskPreview() {
+fun HomeScreenRunningTaskPreview() {
     TimeTrackerAppTheme {
         Surface(
             color = MaterialTheme.colors.background
         ) {
-            MainView(
+            HomeView(
                 slice = WorkSlice(
                     UUID.randomUUID(),
                     Project("my Project"),
@@ -154,15 +154,15 @@ fun MainScreenRunningTaskPreview() {
 @Preview(
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
-    name = "MainScreenChoosingTaskPreviewDark"
+    name = "HomeScreenChoosingTaskPreviewDark"
 )
 @Composable
-fun MainScreenChoosingTaskPreview() {
+fun HomeScreenChoosingTaskPreview() {
     TimeTrackerAppTheme {
         Surface(
             color = MaterialTheme.colors.background
         ) {
-            MainView(
+            HomeView(
                 slice = null,
                 finishedSlices = createTestSlices(),
                 currentDescription = "",

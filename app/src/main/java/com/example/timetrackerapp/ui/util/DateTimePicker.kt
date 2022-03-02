@@ -1,4 +1,4 @@
-package com.example.timetrackerapp.ui
+package com.example.timetrackerapp.ui.util
 
 import androidx.compose.runtime.Composable
 import com.vanpra.composematerialdialogs.MaterialDialog

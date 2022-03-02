@@ -1,4 +1,4 @@
-package com.example.timetrackerapp.ui
+package com.example.timetrackerapp.ui.slice
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.*
@@ -15,7 +15,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.timetrackerapp.model.*
+import com.example.timetrackerapp.ui.home.ActionButton
 import com.example.timetrackerapp.ui.theme.TimeTrackerAppTheme
+import com.example.timetrackerapp.ui.util.DatePicker
+import com.example.timetrackerapp.ui.util.TimePicker
 import com.example.timetrackerapp.util.*
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.datetime.*
