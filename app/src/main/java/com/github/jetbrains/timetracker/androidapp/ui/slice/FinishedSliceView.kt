@@ -1,6 +1,8 @@
 package com.github.jetbrains.timetracker.androidapp.ui.slice
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import com.github.jetbrains.timetracker.androidapp.model.applyChanges
 import com.github.jetbrains.timetracker.androidapp.ui.util.LoadingView
 import java.util.*
 
@@ -9,23 +11,24 @@ fun FinishedSliceView(
     id: UUID,
     finishedSliceViewModel: FinishedSliceViewModel,
 ) {
+    val sliceChangesState = remember { SliceChangesState() }
     finishedSliceViewModel.updateChosenSlice(id)
     if (finishedSliceViewModel.slice == null) {
         LoadingView()
         return
     }
     SliceDetailedView(
-        slice = finishedSliceViewModel.slice!!,
+        slice = finishedSliceViewModel.slice!!.applyChanges(sliceChangesState.changes),
         sliceInfoUpdates = SliceInfoUpdates(
-            onProjectChanged = finishedSliceViewModel::onProjectChanged,
-            onTaskChanged = finishedSliceViewModel::onTaskChanged,
-            onDescriptionChanged = finishedSliceViewModel::onDescriptionChanged,
-            onStartDateChange = finishedSliceViewModel::onStartDateChanged,
-            onStartTimeChange = finishedSliceViewModel::onStartTimeChanged,
-            onFinishDateChange = finishedSliceViewModel::onFinishDateChanged,
-            onFinishTimeChange = finishedSliceViewModel::onFinishTimeChanged,
-            onDurationChange = finishedSliceViewModel::onDurationChanged,
-            onSave = finishedSliceViewModel::onSave,
+            onProjectChanged = sliceChangesState::onProjectChanged,
+            onTaskChanged = sliceChangesState::onTaskChanged,
+            onDescriptionChanged = sliceChangesState::onDescriptionChanged,
+            onStartDateChange = sliceChangesState::onStartDateChanged,
+            onStartTimeChange = sliceChangesState::onStartTimeChanged,
+            onFinishDateChange = sliceChangesState::onFinishDateChanged,
+            onFinishTimeChange = sliceChangesState::onFinishTimeChanged,
+            onDurationChange = sliceChangesState::onDurationChanged,
+            onSave = { finishedSliceViewModel.onSave(sliceChangesState.changes) },
         ),
         runningSliceUpdates = emptyRunningSliceUpdates,
     )

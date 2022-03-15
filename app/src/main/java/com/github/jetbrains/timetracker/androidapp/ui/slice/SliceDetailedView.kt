@@ -14,14 +14,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.github.jetbrains.timetracker.androidapp.model.*
 import com.github.jetbrains.timetracker.androidapp.ui.home.ActionButton
 import com.github.jetbrains.timetracker.androidapp.ui.theme.TimeTrackerAppTheme
 import com.github.jetbrains.timetracker.androidapp.ui.util.DatePicker
 import com.github.jetbrains.timetracker.androidapp.ui.util.TimePicker
-import com.github.jetbrains.timetracker.androidapp.model.Description
-import com.github.jetbrains.timetracker.androidapp.model.Project
-import com.github.jetbrains.timetracker.androidapp.model.Task
-import com.github.jetbrains.timetracker.androidapp.model.WorkSlice
 import com.github.jetbrains.timetracker.androidapp.util.*
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.datetime.*
