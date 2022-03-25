@@ -1,17 +1,15 @@
 package com.github.jetbrains.timetracker.androidapp.ui
 
-import android.app.Activity
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.github.jetbrains.timetracker.androidapp.auth.FirebaseAuthenticationProvider
 import com.github.jetbrains.timetracker.androidapp.data.FakeSlicesRepository
-import com.github.jetbrains.timetracker.androidapp.model.User
 import com.github.jetbrains.timetracker.androidapp.ui.auth.LoginScreen
 import com.github.jetbrains.timetracker.androidapp.ui.theme.TimeTrackerAppTheme
 import com.google.firebase.auth.FirebaseAuth
@@ -21,16 +19,31 @@ import com.google.firebase.ktx.Firebase
 @Composable
 fun TimeTrackerAppWithAuthentication(
     repository: FakeSlicesRepository,
-    onAuthenticationFail: () -> Unit
 ) {
+    var showLoginScreen by remember { mutableStateOf(true) }
     val auth: FirebaseAuth = Firebase.auth
-    var currentUser = remember { auth.currentUser?.let { User(it.uid) } }
-    if (currentUser == null) {
-        LoginScreen(
-            auth = auth,
-            onLogin = { user -> currentUser = user },
-            onFail = onAuthenticationFail
-        )
+    val authProvider = FirebaseAuthenticationProvider(auth)
+    if (auth.currentUser == null && showLoginScreen) {
+        var prevError by remember { mutableStateOf<String?>(null) }
+        TimeTrackerAppTheme {
+            LoginScreen(
+                onLogIn = { email: String, password: String ->
+                    authProvider.logIn(
+                        email, password,
+                        onSuccessfulLogIn = { showLoginScreen = false },
+                        onError = { exception -> prevError = exception?.message },
+                    )
+                },
+                onSignIn = { email: String, password: String, name: String ->
+                    authProvider.signUp(
+                        email, password, name,
+                        onSuccessfulSignIn = { showLoginScreen = false },
+                        onError = { exception -> prevError = exception?.message },
+                    )
+                },
+                previousErrorText = prevError,
+            )
+        }
     } else {
         TimeTrackerApp(repository)
     }
@@ -47,7 +60,8 @@ fun TimeTrackerApp(repository: FakeSlicesRepository) {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(currentScreen.title) },
+                    // TODO Show user details properly, add 'Log out'
+                    title = { Text(currentScreen.title + " (${Firebase.auth.currentUser?.displayName ?: ""})") },
                     navigationIcon = if (currentScreen != TimeTrackerScreen.Home) {
                         {
                             IconButton(onClick = { navController.navigate(TimeTrackerScreen.Home.name) }) {

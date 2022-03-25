@@ -26,17 +26,11 @@ class MainActivity : ComponentActivity() {
             .build()
         firestore.firestoreSettings = settings*/
 
+        // TODO use emulator in debug mode
         // https://firebase.google.com/docs/emulator-suite/connect_auth
         FirebaseAuth.getInstance().useEmulator("10.0.2.2", 9099);
         setContent {
-            TimeTrackerAppWithAuthentication(
-                repository = repository,
-                onAuthenticationFail = {
-                    Toast.makeText(this, "Authentication failed.",
-                        Toast.LENGTH_SHORT).show()
-                }
-            )
+            TimeTrackerAppWithAuthentication(repository)
         }
     }
-
 }
