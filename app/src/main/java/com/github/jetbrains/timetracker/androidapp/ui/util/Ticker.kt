@@ -32,17 +32,20 @@ fun <T, R> Flow<T>.transformAndEmitRegularly(
     tickFlow: Flow<Unit>,
     transform: (T) -> R
 ): Flow<R?> {
+    val flow = this@transformAndEmitRegularly
     return channelFlow {
         val mutex = Mutex()
         var lastElement: T? = null
         scope.launch {
             tickFlow.collect {
                 mutex.withLock {
-                    send(lastElement?.let(transform))
+                    lastElement?.let { element ->
+                        send(transform(element))
+                    }
                 }
             }
         }
-        collect { element ->
+        flow.collect { element ->
             send(transform(element))
             mutex.withLock {
                 lastElement = element
