@@ -5,12 +5,12 @@ import java.util.*
 import kotlin.time.Duration
 
 data class RunningSlice(
-    val id: UUID,
+    val id: UUID = UUID.randomUUID(),
     val project: Project,
     val task: Task,
     val description: Description,
-    val isPaused: Boolean,
-    val intervals: List<TimeInterval>,
+    val isPaused: Boolean = false,
+    val intervals: List<TimeInterval> = listOf(OpenTimeInterval()),
 ) {
     init {
         check(intervals.isNotEmpty())
@@ -37,3 +37,14 @@ fun RunningSlice.resume(): RunningSlice =
         isPaused = false,
         intervals = intervals + OpenTimeInterval(),
     )
+
+fun RunningSlice.finish(): WorkSlice = WorkSlice(
+    id = id,
+    project = project,
+    task = task,
+    description = description,
+    startInstant = startInstant,
+    finishInstant = countCurrentFinishInstant(),
+    duration = countCurrentDuration(),
+    state = WorkSlice.State.FINISHED,
+)

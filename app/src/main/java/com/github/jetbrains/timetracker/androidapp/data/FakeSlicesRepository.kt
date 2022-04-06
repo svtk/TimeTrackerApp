@@ -42,12 +42,9 @@ class FakeSlicesRepository : SlicesRepository {
 
     override suspend fun startRunningSlice(description: Description, task: Task, project: Project) {
         runningSliceStateFlow.value = RunningSlice(
-            id = UUID.randomUUID(),
             project = project,
             task = task,
             description = description,
-            isPaused = false,
-            intervals = listOf(OpenTimeInterval())
         )
     }
 
@@ -75,16 +72,7 @@ class FakeSlicesRepository : SlicesRepository {
         mutex.withLock {
             runningSliceStateFlow.value?.let { slice ->
                 finishedSlicesStateFlow.update { list ->
-                    list + WorkSlice(
-                        id = slice.id,
-                        project = slice.project,
-                        task = slice.task,
-                        description = slice.description,
-                        startInstant = slice.startInstant,
-                        finishInstant = slice.countCurrentFinishInstant(),
-                        duration = slice.countCurrentDuration(),
-                        state = WorkSlice.State.FINISHED,
-                    )
+                    list + slice.finish()
                 }
             }
             runningSliceStateFlow.update { null }

@@ -15,4 +15,12 @@ interface AuthenticationProvider {
         onSuccessfulLogIn: () -> Unit,
         onError: (e: Exception?) -> Unit,
     )
+
+    val currentUser: User?
 }
+
+data class User(
+    val uid: String,
+    val email: String?,
+    val displayName: String?
+)

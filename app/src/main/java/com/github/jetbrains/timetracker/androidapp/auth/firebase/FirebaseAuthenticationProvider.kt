@@ -1,7 +1,9 @@
-package com.github.jetbrains.timetracker.androidapp.auth
+package com.github.jetbrains.timetracker.androidapp.auth.firebase
 
 import android.content.ContentValues.TAG
 import android.util.Log
+import com.github.jetbrains.timetracker.androidapp.auth.AuthenticationProvider
+import com.github.jetbrains.timetracker.androidapp.auth.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.auth.ktx.userProfileChangeRequest
@@ -62,4 +64,13 @@ class FirebaseAuthenticationProvider(
                 }
             }
     }
+
+    override val currentUser
+        get() = auth.currentUser?.let {
+            User(
+                it.uid,
+                it.email,
+                it.displayName
+            )
+        }
 }

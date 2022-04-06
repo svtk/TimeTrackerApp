@@ -1,12 +1,16 @@
 package com.github.jetbrains.timetracker.androidapp
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import com.github.jetbrains.timetracker.androidapp.auth.FakeAuthenticationProvider
+import com.github.jetbrains.timetracker.androidapp.auth.firebase.FirebaseAuthenticationProvider
 import com.github.jetbrains.timetracker.androidapp.data.FakeSlicesRepository
+import com.github.jetbrains.timetracker.androidapp.data.firestore.FirestoreSlicesRepository
 import com.github.jetbrains.timetracker.androidapp.ui.TimeTrackerAppWithAuthentication
-import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 
 class MainActivity : ComponentActivity() {
@@ -14,23 +18,40 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // TODO use dependency injection
-        val repository = FakeSlicesRepository()
 
-/*        // 10.0.2.2 is the special IP address to connect to the 'localhost' of
-        // the host computer from an Android emulator.
-        val firestore = FirebaseFirestore.getInstance()
-        firestore.useEmulator("10.0.2.2", 8080)
+        val useFirebase = true
+        val useFirebaseEmulator = true
 
-        val settings = FirebaseFirestoreSettings.Builder()
-            .setPersistenceEnabled(false)
-            .build()
-        firestore.firestoreSettings = settings*/
+        // 10.0.2.2 is the special IP address to connect to the 'localhost' of
+        // the host computer from an Android emulator
+        // If run from Android device with 'Port forwarding', it should be "localhost"
+        val host = "10.0.2.2"
+//        val host = "localhost"
 
-        // TODO use emulator in debug mode
-        // https://firebase.google.com/docs/emulator-suite/connect_auth
-        FirebaseAuth.getInstance().useEmulator("10.0.2.2", 9099);
+        val authProvider =
+            if (useFirebase)
+                FirebaseAuthenticationProvider(Firebase.auth)
+            else
+                FakeAuthenticationProvider()
+        if (useFirebase && useFirebaseEmulator)
+            Firebase.auth.useEmulator(host, 9099)
+
+        val repository =
+            if (useFirebase)
+                FirestoreSlicesRepository(Firebase.firestore, authProvider)
+            else
+                FakeSlicesRepository()
+        if (useFirebase && useFirebaseEmulator)
+            Firebase.firestore.useEmulator(host, 8080)
+
+        if (useFirebaseEmulator) {
+            // To clear the old data instead of uninstalling the app
+            Firebase.auth.signOut()
+            Firebase.firestore.clearPersistence()
+        }
+
         setContent {
-            TimeTrackerAppWithAuthentication(repository)
+            TimeTrackerAppWithAuthentication(authProvider, repository)
         }
     }
 }

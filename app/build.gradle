@@ -64,11 +64,13 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1"
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1"
     implementation "androidx.navigation:navigation-compose:2.4.1"
-
     implementation "androidx.compose.material:material-icons-extended:$compose_version"
-    implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.3.1"
-    implementation "org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.4"
     implementation "io.github.vanpra.compose-material-dialogs:datetime:0.6.3"
+
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.3.2"
 
     implementation platform('com.google.firebase:firebase-bom:29.1.0')
     implementation 'com.google.firebase:firebase-analytics-ktx'

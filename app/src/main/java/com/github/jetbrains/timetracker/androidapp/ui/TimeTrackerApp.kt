@@ -8,8 +8,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.github.jetbrains.timetracker.androidapp.auth.FirebaseAuthenticationProvider
-import com.github.jetbrains.timetracker.androidapp.data.FakeSlicesRepository
+import com.github.jetbrains.timetracker.androidapp.auth.AuthenticationProvider
+import com.github.jetbrains.timetracker.androidapp.data.SlicesRepository
 import com.github.jetbrains.timetracker.androidapp.ui.auth.LoginScreen
 import com.github.jetbrains.timetracker.androidapp.ui.theme.TimeTrackerAppTheme
 import com.google.firebase.auth.FirebaseAuth
@@ -18,11 +18,11 @@ import com.google.firebase.ktx.Firebase
 
 @Composable
 fun TimeTrackerAppWithAuthentication(
-    repository: FakeSlicesRepository,
+    authProvider: AuthenticationProvider,
+    repository: SlicesRepository,
 ) {
     var showLoginScreen by remember { mutableStateOf(true) }
     val auth: FirebaseAuth = Firebase.auth
-    val authProvider = FirebaseAuthenticationProvider(auth)
     if (auth.currentUser == null && showLoginScreen) {
         var prevError by remember { mutableStateOf<String?>(null) }
         TimeTrackerAppTheme {
@@ -50,7 +50,7 @@ fun TimeTrackerAppWithAuthentication(
 }
 
 @Composable
-fun TimeTrackerApp(repository: FakeSlicesRepository) {
+fun TimeTrackerApp(repository: SlicesRepository) {
     TimeTrackerAppTheme {
         val navController = rememberNavController()
         val backstackEntry = navController.currentBackStackEntryAsState()
