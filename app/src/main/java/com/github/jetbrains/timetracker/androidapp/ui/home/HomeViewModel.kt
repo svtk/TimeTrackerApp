@@ -4,7 +4,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.github.jetbrains.timetracker.androidapp.data.SlicesRepository
 import com.github.jetbrains.timetracker.androidapp.model.Description
@@ -86,19 +85,6 @@ class HomeViewModel(
     fun finishRunningSlice() {
         viewModelScope.launch {
             repository.finishRunningSlice()
-        }
-    }
-
-    companion object {
-        fun provideFactory(
-            repository: SlicesRepository
-        ): ViewModelProvider.Factory {
-            return object : ViewModelProvider.Factory {
-                @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return HomeViewModel(repository) as T
-                }
-            }
         }
     }
 }

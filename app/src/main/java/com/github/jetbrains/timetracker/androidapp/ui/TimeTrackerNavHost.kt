@@ -1,19 +1,14 @@
 package com.github.jetbrains.timetracker.androidapp.ui
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.github.jetbrains.timetracker.androidapp.data.SlicesRepository
 import com.github.jetbrains.timetracker.androidapp.ui.home.HomeView
-import com.github.jetbrains.timetracker.androidapp.ui.home.HomeViewModel
 import com.github.jetbrains.timetracker.androidapp.ui.slice.FinishedSliceView
-import com.github.jetbrains.timetracker.androidapp.ui.slice.FinishedSliceViewModel
 import com.github.jetbrains.timetracker.androidapp.ui.slice.RunningSliceView
-import com.github.jetbrains.timetracker.androidapp.ui.slice.RunningSliceViewModel
 import java.util.*
 
 enum class TimeTrackerScreen(val title: String) {
@@ -32,7 +27,6 @@ enum class TimeTrackerScreen(val title: String) {
 
 @Composable
 fun TimeTrackerNavHost(
-    repository: SlicesRepository,
     navController: NavHostController,
 ) {
     NavHost(
@@ -41,18 +35,12 @@ fun TimeTrackerNavHost(
     ) {
         composable(TimeTrackerScreen.Home.name) {
             HomeView(
-                homeViewModel = viewModel(factory = HomeViewModel.provideFactory(repository)),
                 navigateToRunningSlice = { navController.navigate(TimeTrackerScreen.RunningSlice.name) },
                 navigateToChosenSlice = { id -> navController.navigate("${TimeTrackerScreen.ViewSlice.name}/$id") },
             )
         }
         composable(TimeTrackerScreen.RunningSlice.name) {
             RunningSliceView(
-                runningSliceViewModel = viewModel(
-                    factory = RunningSliceViewModel.provideFactory(
-                        repository
-                    )
-                ),
                 navigateToHome = { navController.navigate(TimeTrackerScreen.Home.name) },
             )
         }
@@ -65,11 +53,6 @@ fun TimeTrackerNavHost(
             val sliceId = UUID.fromString(entry.arguments?.get("id") as String)
             FinishedSliceView(
                 id = sliceId,
-                finishedSliceViewModel = viewModel(
-                    factory = FinishedSliceViewModel.provideFactory(
-                        repository
-                    )
-                ),
             )
         }
     }

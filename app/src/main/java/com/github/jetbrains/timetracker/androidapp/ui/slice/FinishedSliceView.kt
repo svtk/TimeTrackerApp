@@ -4,12 +4,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.github.jetbrains.timetracker.androidapp.model.applyChanges
 import com.github.jetbrains.timetracker.androidapp.ui.util.LoadingView
+import org.koin.androidx.compose.getViewModel
 import java.util.*
 
 @Composable
 fun FinishedSliceView(
     id: UUID,
-    finishedSliceViewModel: FinishedSliceViewModel,
+    finishedSliceViewModel: FinishedSliceViewModel = getViewModel(),
 ) {
     val sliceChangesState = remember { SliceChangesState() }
     finishedSliceViewModel.updateChosenSlice(id)

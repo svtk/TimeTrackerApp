@@ -4,15 +4,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.github.jetbrains.timetracker.androidapp.data.SlicesRepository
-import com.github.jetbrains.timetracker.androidapp.model.*
+import com.github.jetbrains.timetracker.androidapp.model.SliceChanges
+import com.github.jetbrains.timetracker.androidapp.model.WorkSlice
+import com.github.jetbrains.timetracker.androidapp.model.applyChanges
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
 import java.util.*
-import kotlin.time.Duration
 
 class FinishedSliceViewModel(
     private val repository: SlicesRepository
@@ -41,18 +39,5 @@ class FinishedSliceViewModel(
             }
         }
         clearChosenSlice()
-    }
-
-    companion object {
-        fun provideFactory(
-            repository: SlicesRepository
-        ): ViewModelProvider.Factory {
-            return object : ViewModelProvider.Factory {
-                @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return FinishedSliceViewModel(repository) as T
-                }
-            }
-        }
     }
 }

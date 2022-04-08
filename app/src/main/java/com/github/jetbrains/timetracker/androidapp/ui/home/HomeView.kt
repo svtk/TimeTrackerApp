@@ -20,12 +20,13 @@ import com.github.jetbrains.timetracker.androidapp.ui.theme.TimeTrackerAppTheme
 import com.github.jetbrains.timetracker.androidapp.util.changeBorderColor
 import com.github.jetbrains.timetracker.androidapp.util.createTestInstant
 import com.github.jetbrains.timetracker.androidapp.util.createTestSlices
+import org.koin.androidx.compose.getViewModel
 import java.util.*
 import kotlin.time.Duration.Companion.minutes
 
 @Composable
 fun HomeView(
-    homeViewModel: HomeViewModel,
+    homeViewModel: HomeViewModel = getViewModel(),
     navigateToRunningSlice: () -> Unit,
     navigateToChosenSlice: (UUID) -> Unit,
 ) {

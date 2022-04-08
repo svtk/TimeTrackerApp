@@ -9,9 +9,9 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.ktx.Firebase
 
-class FirebaseAuthenticationProvider(
-    private val auth: FirebaseAuth = Firebase.auth,
-) : AuthenticationProvider {
+class FirebaseAuthenticationProvider : AuthenticationProvider {
+    private val auth: FirebaseAuth = Firebase.auth
+
     override fun signUp(
         email: String,
         password: String,

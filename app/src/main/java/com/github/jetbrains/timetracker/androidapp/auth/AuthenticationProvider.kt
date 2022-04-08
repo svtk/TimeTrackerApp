@@ -1,6 +1,8 @@
 package com.github.jetbrains.timetracker.androidapp.auth
 
-interface AuthenticationProvider {
+import org.koin.core.component.KoinComponent
+
+interface AuthenticationProvider: KoinComponent {
     fun signUp(
         email: String,
         password: String,

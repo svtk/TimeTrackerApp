@@ -18,12 +18,12 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import org.koin.core.component.inject
 import java.util.*
 
-class FirestoreSlicesRepository(
-    private val db: FirebaseFirestore = Firebase.firestore,
-    private val authenticationProvider: AuthenticationProvider,
-) : SlicesRepository {
+class FirestoreSlicesRepository : SlicesRepository {
+    private val db: FirebaseFirestore = Firebase.firestore
+    private val authenticationProvider by inject<AuthenticationProvider>()
 
     // TODO Store timestamps and reduce the number of operations
     // https://medium.com/firebase-tips-tricks/how-to-drastically-reduce-the-number-of-reads-when-no-documents-are-changed-in-firestore-8760e2f25e9e

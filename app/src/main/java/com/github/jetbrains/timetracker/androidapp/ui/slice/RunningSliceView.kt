@@ -6,10 +6,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.github.jetbrains.timetracker.androidapp.model.applyChanges
 import com.github.jetbrains.timetracker.androidapp.ui.util.LoadingView
+import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun RunningSliceView(
-    runningSliceViewModel: RunningSliceViewModel,
+    runningSliceViewModel: RunningSliceViewModel = getViewModel(),
     navigateToHome: () -> Unit,
 ) {
     val runningSlice by runningSliceViewModel.slice.collectAsState(initial = null)

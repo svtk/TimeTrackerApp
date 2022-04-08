@@ -2,9 +2,10 @@ package com.github.jetbrains.timetracker.androidapp.data
 
 import com.github.jetbrains.timetracker.androidapp.model.*
 import kotlinx.coroutines.flow.Flow
+import org.koin.core.component.KoinComponent
 import java.util.*
 
-interface SlicesRepository {
+interface SlicesRepository : KoinComponent {
 
     fun observeFinishedSlices(): Flow<List<WorkSlice>>
 

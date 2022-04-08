@@ -1,7 +1,6 @@
 package com.github.jetbrains.timetracker.androidapp.ui.slice
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.github.jetbrains.timetracker.androidapp.data.SlicesRepository
 import com.github.jetbrains.timetracker.androidapp.model.RunningSlice
@@ -45,19 +44,6 @@ class RunningSliceViewModel(
     fun onFinishClicked() {
         viewModelScope.launch {
             repository.finishRunningSlice()
-        }
-    }
-
-    companion object {
-        fun provideFactory(
-            repository: SlicesRepository
-        ): ViewModelProvider.Factory {
-            return object : ViewModelProvider.Factory {
-                @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return RunningSliceViewModel(repository) as T
-                }
-            }
         }
     }
 }
