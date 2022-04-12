@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.time.Duration.Companion.seconds
 
-class HomeViewModel(
+class TimerViewModel(
     private val repository: SlicesRepository
 ) : ViewModel() {
 

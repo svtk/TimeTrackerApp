@@ -25,37 +25,28 @@ import java.util.*
 import kotlin.time.Duration.Companion.minutes
 
 @Composable
-fun HomeView(
-    homeViewModel: HomeViewModel = getViewModel(),
+fun LogsView(
+    timerViewModel: TimerViewModel = getViewModel(),
     navigateToRunningSlice: () -> Unit,
     navigateToChosenSlice: (UUID) -> Unit,
 ) {
-    val finishedSlices by homeViewModel.finishedSlices.collectAsState()
-    val runningSlice by homeViewModel.runningSlice.collectAsState(null)
-    HomeView(
+    val finishedSlices by timerViewModel.finishedSlices.collectAsState()
+    val runningSlice by timerViewModel.runningSlice.collectAsState(null)
+    LogsView(
         slice = runningSlice,
         finishedSlices = finishedSlices,
-        currentDescription = homeViewModel.currentDescription,
-        onDescriptionUpdate = homeViewModel::updateDescription,
-        onNewSlice = {
-            homeViewModel.startNewSlice()
-            navigateToRunningSlice()
-        },
         onCardClicked = navigateToChosenSlice,
-        onSimilarSliceStarted = homeViewModel::startSimilarSlice,
+        onSimilarSliceStarted = timerViewModel::startSimilarSlice,
         onCurrentSliceClicked = navigateToRunningSlice,
-        onCurrentSliceResumed = homeViewModel::resumeRunningSlice,
-        onCurrentSliceFinished = homeViewModel::finishRunningSlice,
+        onCurrentSliceResumed = timerViewModel::resumeRunningSlice,
+        onCurrentSliceFinished = timerViewModel::finishRunningSlice,
     )
 }
 
 @Composable
-fun HomeView(
+fun LogsView(
     slice: WorkSlice?,
     finishedSlices: List<WorkSlice>,
-    currentDescription: String,
-    onDescriptionUpdate: (String) -> Unit,
-    onNewSlice: () -> Unit,
     onCardClicked: (id: UUID) -> Unit,
     onSimilarSliceStarted: (id: UUID) -> Unit,
     onCurrentSliceClicked: () -> Unit,
@@ -64,13 +55,7 @@ fun HomeView(
 ) {
     Column {
         Box(modifier = Modifier.padding(8.dp)) {
-            if (slice == null) {
-                StartingNewSlice(
-                    description = currentDescription,
-                    onDescriptionUpdate = onDescriptionUpdate,
-                    onNewSlice = onNewSlice
-                )
-            } else {
+            if (slice != null) {
                 RunningSliceCard(
                     slice = slice,
                     duration = slice.duration,
@@ -88,39 +73,6 @@ fun HomeView(
     }
 }
 
-@Composable
-fun StartingNewSlice(
-    description: String,
-    onDescriptionUpdate: (String) -> Unit,
-    onNewSlice: () -> Unit
-) {
-    Card(Modifier.padding(12.dp)) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(12.dp),
-        ) {
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(0.8f),
-                value = description,
-                onValueChange = { onDescriptionUpdate(it) },
-                label = { Text("I'm working on...") },
-                colors = TextFieldDefaults.changeBorderColor(),
-            )
-            IconButton(
-                onClick = onNewSlice,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.PlayCircle,
-                    contentDescription = "Start",
-                    modifier = Modifier.size(48.dp),
-                    tint = MaterialTheme.colors.secondary,
-                )
-            }
-        }
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenRunningTaskPreview() {
@@ -128,7 +80,7 @@ fun HomeScreenRunningTaskPreview() {
         Surface(
             color = MaterialTheme.colors.background
         ) {
-            HomeView(
+            LogsView(
                 slice = WorkSlice(
                     UUID.randomUUID(),
                     Project("my Project"),
@@ -140,9 +92,6 @@ fun HomeScreenRunningTaskPreview() {
                     state = WorkSlice.State.RUNNING,
                 ),
                 finishedSlices = createTestSlices(),
-                currentDescription = "",
-                onDescriptionUpdate = {},
-                onNewSlice = {},
                 onCardClicked = {},
                 onSimilarSliceStarted = {},
                 onCurrentSliceClicked = {},
@@ -165,12 +114,9 @@ fun HomeScreenChoosingTaskPreview() {
         Surface(
             color = MaterialTheme.colors.background
         ) {
-            HomeView(
+            LogsView(
                 slice = null,
                 finishedSlices = createTestSlices(),
-                currentDescription = "",
-                onDescriptionUpdate = {},
-                onNewSlice = {},
                 onCardClicked = {},
                 onSimilarSliceStarted = {},
                 onCurrentSliceClicked = {},

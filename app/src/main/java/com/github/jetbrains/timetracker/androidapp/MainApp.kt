@@ -7,7 +7,7 @@ import com.github.jetbrains.timetracker.androidapp.auth.firebase.FirebaseAuthent
 import com.github.jetbrains.timetracker.androidapp.data.FakeSlicesRepository
 import com.github.jetbrains.timetracker.androidapp.data.SlicesRepository
 import com.github.jetbrains.timetracker.androidapp.data.firestore.FirestoreSlicesRepository
-import com.github.jetbrains.timetracker.androidapp.ui.home.HomeViewModel
+import com.github.jetbrains.timetracker.androidapp.ui.home.TimerViewModel
 import com.github.jetbrains.timetracker.androidapp.ui.slice.FinishedSliceViewModel
 import com.github.jetbrains.timetracker.androidapp.ui.slice.RunningSliceViewModel
 import com.google.firebase.auth.ktx.auth
@@ -44,7 +44,7 @@ class MainApp : Application() {
                 setUpFirebaseEmulator()
             }
 
-            viewModel { HomeViewModel(get()) }
+            viewModel { TimerViewModel(get()) }
             viewModel { RunningSliceViewModel(get()) }
             viewModel { FinishedSliceViewModel(get()) }
         }

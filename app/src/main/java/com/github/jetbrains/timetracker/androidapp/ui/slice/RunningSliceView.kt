@@ -5,18 +5,21 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.github.jetbrains.timetracker.androidapp.model.applyChanges
-import com.github.jetbrains.timetracker.androidapp.ui.util.LoadingView
+import com.github.jetbrains.timetracker.androidapp.ui.home.NewSliceView
 import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun RunningSliceView(
     runningSliceViewModel: RunningSliceViewModel = getViewModel(),
-    navigateToHome: () -> Unit,
+    navigateToRunningSlice: () -> Unit,
+    navigateToLogs: () -> Unit,
 ) {
     val runningSlice by runningSliceViewModel.slice.collectAsState(initial = null)
     val sliceChangesState = remember { SliceChangesState() }
     if (runningSlice == null) {
-        LoadingView()
+        NewSliceView(
+            navigateToRunningSlice = navigateToRunningSlice,
+        )
         return
     }
     fun onSave() {
@@ -47,7 +50,7 @@ fun RunningSliceView(
             onResumeClicked = runningSliceViewModel::onResumeClicked,
             onFinishClicked = {
                 runningSliceViewModel.onFinishClicked()
-                navigateToHome()
+                navigateToLogs()
             },
         ),
     )

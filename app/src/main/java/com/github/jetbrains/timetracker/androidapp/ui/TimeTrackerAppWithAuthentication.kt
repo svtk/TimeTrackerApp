@@ -14,8 +14,7 @@ fun TimeTrackerAppWithAuthentication(
     authProvider: AuthenticationProvider = get()
 ) {
     var showLoginScreen by remember { mutableStateOf(true) }
-    val auth: FirebaseAuth = Firebase.auth
-    if (auth.currentUser == null && showLoginScreen) {
+    if (authProvider.currentUser == null && showLoginScreen) {
         var prevError by remember { mutableStateOf<String?>(null) }
         TimeTrackerAppTheme {
             LoginScreen(
