@@ -6,16 +6,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.jetbrains.timetracker.androidapp.data.SlicesRepository
-import com.github.jetbrains.timetracker.androidapp.model.Description
-import com.github.jetbrains.timetracker.androidapp.model.Project
-import com.github.jetbrains.timetracker.androidapp.model.Task
-import com.github.jetbrains.timetracker.androidapp.model.WorkSlice
+import com.github.jetbrains.timetracker.androidapp.model.*
 import com.github.jetbrains.timetracker.androidapp.ui.slice.convertToWorkSliceAndEmitEverySecond
 import com.github.jetbrains.timetracker.androidapp.ui.util.TickHandler
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.time.Duration.Companion.seconds
@@ -35,6 +29,13 @@ class TimerViewModel(
 
     val finishedSlices: StateFlow<List<WorkSlice>> =
         repository.observeFinishedSlices().stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(),
+            emptyList()
+        )
+
+    val workActivities: StateFlow<List<WorkActivity>> =
+        repository.observeWorkActivitiesSuggestions().stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(),
             emptyList()
@@ -63,16 +64,14 @@ class TimerViewModel(
         Task(""),
     )
 
-    fun startSimilarSlice(id: UUID) {
+    fun startSimilarActivity(workActivity: WorkActivity) {
         finishRunningSlice()
         viewModelScope.launch {
-            repository.getFinishedSlice(id).getOrNull()?.let { originalSlice ->
-                startNewSlice(
-                    originalSlice.description.value,
-                    originalSlice.project,
-                    originalSlice.task
-                )
-            }
+            startNewSlice(
+                workActivity.description.value,
+                workActivity.project,
+                workActivity.task
+            )
         }
     }
 

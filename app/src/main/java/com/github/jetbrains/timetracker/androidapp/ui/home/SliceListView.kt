@@ -25,17 +25,13 @@ import kotlin.time.Duration
 fun SliceListView(
     slices: List<WorkSlice>,
     onCardClicked: (id: UUID) -> Unit,
-    onSimilarSliceStarted: (id: UUID) -> Unit,
 ) {
-    LazyColumn(
-        modifier = Modifier.padding(8.dp)
-    ) {
+    LazyColumn {
         items(slices) { slice ->
             SliceCard(
                 slice = slice,
                 duration = slice.duration,
                 onCardClicked = onCardClicked,
-                onStartClicked = onSimilarSliceStarted,
             )
         }
     }
@@ -46,7 +42,6 @@ fun SliceCard(
     slice: WorkSlice,
     duration: Duration,
     onCardClicked: (id: UUID) -> Unit,
-    onStartClicked: (id: UUID) -> Unit,
 ) {
     Card(
         modifier = Modifier
@@ -55,13 +50,13 @@ fun SliceCard(
         elevation = 4.dp,
     ) {
         Row(
-            modifier = Modifier.padding(start = 12.dp, top = 4.dp, end = 12.dp, bottom = 4.dp),
+            modifier = Modifier.padding(start = 12.dp, top = 4.dp, end = 20.dp, bottom = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(
                 modifier = Modifier
                     .clickable(onClick = { onCardClicked(slice.id) })
-                    .fillMaxWidth(0.8f)
+                    .fillMaxWidth()
             ) {
                 Row {
                     Text(
@@ -81,17 +76,6 @@ fun SliceCard(
                     ProjectText(slice)
                 }
             }
-            IconButton(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = { onStartClicked(slice.id) }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.PlayArrow,
-                    modifier = Modifier.size(32.dp),
-                    contentDescription = "Start",
-                    tint = MaterialTheme.colors.onBackground.copy(alpha = 0.4f),
-                )
-            }
         }
     }
 }
@@ -103,7 +87,6 @@ fun SliceListPreview() {
         SliceListView(
             slices = createTestSlices(),
             onCardClicked = {},
-            onSimilarSliceStarted = {},
         )
     }
 }
@@ -117,7 +100,6 @@ fun SliceCardPreview() {
             slice = slice,
             duration = slice.duration,
             onCardClicked = {},
-            onStartClicked = {},
         )
     }
 }

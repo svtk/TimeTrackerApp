@@ -24,7 +24,7 @@ class MainApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        val useFirebase = true
+        val useFirebase = false
 
         val appModule = module {
 

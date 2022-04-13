@@ -1,9 +1,6 @@
 package com.github.jetbrains.timetracker.androidapp.util
 
-import com.github.jetbrains.timetracker.androidapp.model.Description
-import com.github.jetbrains.timetracker.androidapp.model.Project
-import com.github.jetbrains.timetracker.androidapp.model.Task
-import com.github.jetbrains.timetracker.androidapp.model.WorkSlice
+import com.github.jetbrains.timetracker.androidapp.model.*
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
@@ -46,4 +43,17 @@ fun createTestRunningSlice() = WorkSlice(
     finishInstant = createTestInstant("2022-01-05T10:20"),
     duration = 25.minutes,
     state = WorkSlice.State.RUNNING,
+)
+
+fun createTestActivities() = listOf(
+    WorkActivity(
+        project = Project("project 1"),
+        task = Task("task 1"),
+        description = Description("short description"),
+    ),
+    WorkActivity(
+        project = Project("project 2 - it should be a very long title"),
+        task = Task("task 2 - also a long title"),
+        description = Description("the description is soo long that it doesn't fit in one line"),
+    ),
 )

@@ -11,54 +11,50 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.github.jetbrains.timetracker.androidapp.model.WorkSlice
+import com.github.jetbrains.timetracker.androidapp.model.WorkActivity
 import com.github.jetbrains.timetracker.androidapp.ui.theme.TimeTrackerAppTheme
 import com.github.jetbrains.timetracker.androidapp.util.changeBorderColor
-import com.github.jetbrains.timetracker.androidapp.util.createTestSlices
+import com.github.jetbrains.timetracker.androidapp.util.createTestActivities
 import org.koin.androidx.compose.getViewModel
-import java.util.*
 
 @Composable
 fun NewSliceView(
     timerViewModel: TimerViewModel = getViewModel(),
     navigateToRunningSlice: () -> Unit,
 ) {
-    val finishedSlices by timerViewModel.finishedSlices.collectAsState()
+    val workActivities by timerViewModel.workActivities.collectAsState()
     NewSliceView(
-        finishedSlices = finishedSlices,
+        workActivities = workActivities,
         currentDescription = timerViewModel.currentDescription,
         onDescriptionUpdate = timerViewModel::updateDescription,
         onNewSlice = {
             timerViewModel.startNewSlice()
             navigateToRunningSlice()
         },
-        onCardClicked = {},
-        onSimilarSliceStarted = timerViewModel::startSimilarSlice,
+        onCardClicked = timerViewModel::startSimilarActivity,
     )
 }
 
 @Composable
 fun NewSliceView(
-    finishedSlices: List<WorkSlice>,
+    workActivities: List<WorkActivity>,
     currentDescription: String,
     onDescriptionUpdate: (String) -> Unit,
     onNewSlice: () -> Unit,
-    onCardClicked: (id: UUID) -> Unit,
-    onSimilarSliceStarted: (id: UUID) -> Unit,
+    onCardClicked: (workActivity: WorkActivity) -> Unit,
 ) {
-    Column {
-        Box(modifier = Modifier.padding(8.dp)) {
-            StartingNewSlice(
-                description = currentDescription,
-                onDescriptionUpdate = onDescriptionUpdate,
-                onNewSlice = onNewSlice
-            )
-        }
-        // TODO suggestions
-        SliceListView(
-            slices = finishedSlices,
+    Column(
+        modifier = Modifier.padding(8.dp)
+    ) {
+        StartingNewSlice(
+            description = currentDescription,
+            onDescriptionUpdate = onDescriptionUpdate,
+            onNewSlice = onNewSlice
+        )
+        Spacer(Modifier.height(16.dp))
+        SuggestionsView(
+            workActivities = workActivities,
             onCardClicked = onCardClicked,
-            onSimilarSliceStarted = onSimilarSliceStarted,
         )
     }
 }
@@ -104,12 +100,11 @@ fun TimerScreenPreview() {
             color = MaterialTheme.colors.background
         ) {
             NewSliceView(
-                finishedSlices = createTestSlices(),
+                workActivities = createTestActivities(),
                 currentDescription = "",
                 onDescriptionUpdate = {},
                 onNewSlice = {},
                 onCardClicked = {},
-                onSimilarSliceStarted = {},
             )
         }
     }

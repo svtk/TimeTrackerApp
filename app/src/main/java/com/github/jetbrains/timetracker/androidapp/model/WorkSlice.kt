@@ -19,6 +19,12 @@ data class WorkSlice(
     }
 }
 
+data class WorkActivity(
+    val project: Project,
+    val task: Task,
+    val description: Description,
+)
+
 data class Project(val value: String)
 
 data class Task(val value: String)

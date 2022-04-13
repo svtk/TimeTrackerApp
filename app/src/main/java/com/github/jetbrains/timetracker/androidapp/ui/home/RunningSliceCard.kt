@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.github.jetbrains.timetracker.androidapp.model.WorkActivity
 import com.github.jetbrains.timetracker.androidapp.model.WorkSlice
 import com.github.jetbrains.timetracker.androidapp.ui.theme.TimeTrackerAppTheme
 import com.github.jetbrains.timetracker.androidapp.util.createTestRunningSlice
@@ -88,12 +89,36 @@ fun ProjectText(slice: WorkSlice) {
 }
 
 @Composable
+fun ProjectText(workActivity: WorkActivity) {
+    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+        Text(
+            style = MaterialTheme.typography.caption,
+            overflow = TextOverflow.Ellipsis,
+            softWrap = false,
+            text = workActivity.project.value +
+                    if (workActivity.task.value.isNotEmpty()) ": ${workActivity.task.value}" else ""
+        )
+    }
+}
+
+
+@Composable
 fun DescriptionText(slice: WorkSlice) {
     Text(
         style = MaterialTheme.typography.body1,
         overflow = TextOverflow.Ellipsis,
         softWrap = false,
         text = slice.description.value,
+    )
+}
+// TODO
+@Composable
+fun DescriptionText(workActivity: WorkActivity) {
+    Text(
+        style = MaterialTheme.typography.body1,
+        overflow = TextOverflow.Ellipsis,
+        softWrap = false,
+        text = workActivity.description.value,
     )
 }
 

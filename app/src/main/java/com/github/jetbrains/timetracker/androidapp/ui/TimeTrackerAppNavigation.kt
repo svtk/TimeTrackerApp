@@ -167,7 +167,6 @@ fun TimeTrackerNavHost(
         composable(TimeTrackerScreen.Timer.name) {
             RunningSliceView(
                 navigateToRunningSlice = { navController.navigate(TimeTrackerScreen.Timer.name) },
-                navigateToLogs = { navController.navigate(TimeTrackerScreen.Logs.name) },
             )
         }
         composable(TimeTrackerScreen.Account.name) {

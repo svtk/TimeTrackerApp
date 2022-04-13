@@ -36,7 +36,6 @@ fun LogsView(
         slice = runningSlice,
         finishedSlices = finishedSlices,
         onCardClicked = navigateToChosenSlice,
-        onSimilarSliceStarted = timerViewModel::startSimilarSlice,
         onCurrentSliceClicked = navigateToRunningSlice,
         onCurrentSliceResumed = timerViewModel::resumeRunningSlice,
         onCurrentSliceFinished = timerViewModel::finishRunningSlice,
@@ -48,27 +47,26 @@ fun LogsView(
     slice: WorkSlice?,
     finishedSlices: List<WorkSlice>,
     onCardClicked: (id: UUID) -> Unit,
-    onSimilarSliceStarted: (id: UUID) -> Unit,
     onCurrentSliceClicked: () -> Unit,
     onCurrentSliceResumed: () -> Unit,
     onCurrentSliceFinished: () -> Unit,
 ) {
-    Column {
-        Box(modifier = Modifier.padding(8.dp)) {
-            if (slice != null) {
-                RunningSliceCard(
-                    slice = slice,
-                    duration = slice.duration,
-                    onCardClicked = onCurrentSliceClicked,
-                    onResumeClicked = onCurrentSliceResumed,
-                    onFinishClicked = onCurrentSliceFinished,
-                )
-            }
+    Column(
+        modifier = Modifier.padding(8.dp)
+    ) {
+        if (slice != null) {
+            RunningSliceCard(
+                slice = slice,
+                duration = slice.duration,
+                onCardClicked = onCurrentSliceClicked,
+                onResumeClicked = onCurrentSliceResumed,
+                onFinishClicked = onCurrentSliceFinished,
+            )
+            Spacer(Modifier.height(16.dp))
         }
         SliceListView(
             slices = finishedSlices,
             onCardClicked = onCardClicked,
-            onSimilarSliceStarted = onSimilarSliceStarted,
         )
     }
 }
@@ -93,7 +91,6 @@ fun HomeScreenRunningTaskPreview() {
                 ),
                 finishedSlices = createTestSlices(),
                 onCardClicked = {},
-                onSimilarSliceStarted = {},
                 onCurrentSliceClicked = {},
                 onCurrentSliceResumed = {},
                 onCurrentSliceFinished = {},
@@ -118,7 +115,6 @@ fun HomeScreenChoosingTaskPreview() {
                 slice = null,
                 finishedSlices = createTestSlices(),
                 onCardClicked = {},
-                onSimilarSliceStarted = {},
                 onCurrentSliceClicked = {},
                 onCurrentSliceResumed = {},
                 onCurrentSliceFinished = {},

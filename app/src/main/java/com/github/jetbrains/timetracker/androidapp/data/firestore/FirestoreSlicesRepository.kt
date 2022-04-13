@@ -38,6 +38,11 @@ class FirestoreSlicesRepository : SlicesRepository {
         } ?: emptyFlow()
     }
 
+    override fun observeWorkActivitiesSuggestions(): Flow<List<WorkActivity>> {
+        // TODO
+        return emptyFlow()
+    }
+
     override suspend fun getFinishedSlice(id: UUID): Result<WorkSlice?> =
         Result.success(withFinishedSlices {
             document(id.toString()).get().await().toObject<FirestoreWorkSlice>()?.toWorkSlice()

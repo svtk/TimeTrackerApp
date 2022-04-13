@@ -12,7 +12,6 @@ import org.koin.androidx.compose.getViewModel
 fun RunningSliceView(
     runningSliceViewModel: RunningSliceViewModel = getViewModel(),
     navigateToRunningSlice: () -> Unit,
-    navigateToLogs: () -> Unit,
 ) {
     val runningSlice by runningSliceViewModel.slice.collectAsState(initial = null)
     val sliceChangesState = remember { SliceChangesState() }
@@ -48,10 +47,7 @@ fun RunningSliceView(
         runningSliceUpdates = RunningSliceUpdates(
             onPauseClicked = runningSliceViewModel::onPauseClicked,
             onResumeClicked = runningSliceViewModel::onResumeClicked,
-            onFinishClicked = {
-                runningSliceViewModel.onFinishClicked()
-                navigateToLogs()
-            },
+            onFinishClicked = runningSliceViewModel::onFinishClicked,
         ),
     )
 }
