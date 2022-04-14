@@ -181,6 +181,7 @@ fun TimeTrackerNavHost(
             val sliceId = UUID.fromString(entry.arguments?.get("id") as String)
             FinishedSliceView(
                 id = sliceId,
+                navigateToLogs = { navController.navigate(TimeTrackerScreen.Logs.name) }
             )
         }
     }

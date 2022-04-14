@@ -5,6 +5,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.github.jetbrains.timetracker.androidapp.model.applyChanges
+import com.github.jetbrains.timetracker.androidapp.model.isNotEmpty
 import com.github.jetbrains.timetracker.androidapp.ui.home.NewSliceView
 import org.koin.androidx.compose.getViewModel
 
@@ -49,5 +50,6 @@ fun RunningSliceView(
             onResumeClicked = runningSliceViewModel::onResumeClicked,
             onFinishClicked = runningSliceViewModel::onFinishClicked,
         ),
+        isEdited = sliceChangesState.changes.isNotEmpty(),
     )
 }

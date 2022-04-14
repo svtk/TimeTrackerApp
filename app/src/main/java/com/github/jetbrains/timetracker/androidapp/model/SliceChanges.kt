@@ -16,6 +16,16 @@ data class SliceChanges(
     val newDuration: Duration? = null,
 )
 
+fun SliceChanges.isNotEmpty() =
+    newProject != null ||
+    newTask != null ||
+    newDescription != null ||
+    newStartDate != null ||
+    newStartTime != null ||
+    newFinishDate != null ||
+    newFinishTime != null ||
+    newDuration != null
+
 fun WorkSlice.applyChanges(sliceChanges: SliceChanges?): WorkSlice {
     if (sliceChanges == null) return this
     val newStartInstant = startInstant.applyDateAndTimeChanges(

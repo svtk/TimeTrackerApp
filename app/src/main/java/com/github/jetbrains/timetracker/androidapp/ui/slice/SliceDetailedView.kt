@@ -32,6 +32,7 @@ fun SliceDetailedView(
     slice: WorkSlice,
     sliceInfoUpdates: SliceInfoUpdates,
     runningSliceUpdates: RunningSliceUpdates,
+    isEdited: Boolean,
 ) {
     Card(Modifier.padding(12.dp)) {
         Column(Modifier.padding(12.dp)) {
@@ -109,14 +110,21 @@ fun SliceDetailedView(
                     )
                 }
             }
-            Row {
-                OutlinedButton(
-                    onClick = sliceInfoUpdates.onSave,
-                    modifier = Modifier.padding(top = 20.dp)
-                ) {
-                    Text("SAVE")
-                }
-            }
+        }
+    }
+    if (isEdited) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .padding(16.dp),
+            contentAlignment = Alignment.BottomCenter,
+        ) {
+            ExtendedFloatingActionButton(
+                modifier = Modifier.fillMaxWidth(0.5f),
+                text = { Text(text = "SAVE") },
+                onClick = sliceInfoUpdates.onSave,
+            )
         }
     }
 }
@@ -198,6 +206,7 @@ fun FinishedSliceDetailedViewPreview() {
             ),
             sliceInfoUpdates = emptySliceInfoUpdates,
             runningSliceUpdates = emptyRunningSliceUpdates,
+            isEdited = true,
         )
     }
 }
@@ -226,6 +235,7 @@ fun RunningSliceDetailedViewPreview() {
             ),
             sliceInfoUpdates = emptySliceInfoUpdates,
             runningSliceUpdates = emptyRunningSliceUpdates,
+            isEdited = true
         )
     }
 }

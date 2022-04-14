@@ -3,6 +3,7 @@ package com.github.jetbrains.timetracker.androidapp.ui.slice
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.github.jetbrains.timetracker.androidapp.model.applyChanges
+import com.github.jetbrains.timetracker.androidapp.model.isNotEmpty
 import com.github.jetbrains.timetracker.androidapp.ui.util.LoadingView
 import org.koin.androidx.compose.getViewModel
 import java.util.*
@@ -11,6 +12,7 @@ import java.util.*
 fun FinishedSliceView(
     id: UUID,
     finishedSliceViewModel: FinishedSliceViewModel = getViewModel(),
+    navigateToLogs: () -> Unit,
 ) {
     val sliceChangesState = remember { SliceChangesState() }
     finishedSliceViewModel.updateChosenSlice(id)
@@ -29,8 +31,13 @@ fun FinishedSliceView(
             onFinishDateChange = sliceChangesState::onFinishDateChanged,
             onFinishTimeChange = sliceChangesState::onFinishTimeChanged,
             onDurationChange = sliceChangesState::onDurationChanged,
-            onSave = { finishedSliceViewModel.onSave(sliceChangesState.changes) },
+            onSave = {
+                finishedSliceViewModel.onSave(sliceChangesState.changes)
+                sliceChangesState.clearChanges()
+                navigateToLogs()
+            },
         ),
         runningSliceUpdates = emptyRunningSliceUpdates,
+        isEdited = sliceChangesState.changes.isNotEmpty()
     )
 }
