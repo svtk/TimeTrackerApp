@@ -11,7 +11,6 @@ import com.github.jetbrains.timetracker.androidapp.ui.slice.convertToWorkSliceAn
 import com.github.jetbrains.timetracker.androidapp.ui.util.TickHandler
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.util.*
 import kotlin.time.Duration.Companion.seconds
 
 class TimerViewModel(
@@ -34,12 +33,13 @@ class TimerViewModel(
             emptyList()
         )
 
-    val workActivities: StateFlow<List<WorkActivity>> =
-        repository.observeWorkActivitiesSuggestions().stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(),
-            emptyList()
-        )
+    val suggestions: StateFlow<WorkActivitySuggestions> =
+        repository.observeWorkActivitiesSuggestions()
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(),
+                WorkActivitySuggestions()
+            )
 
     fun updateDescription(newText: String) {
         currentDescription = newText

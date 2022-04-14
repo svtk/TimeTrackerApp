@@ -25,6 +25,9 @@ data class WorkActivity(
     val description: Description,
 )
 
+@Deprecated("TODO store work activity inside work slice")
+fun WorkSlice.toWorkActivity() = WorkActivity(project, task, description)
+
 data class Project(val value: String)
 
 data class Task(val value: String)

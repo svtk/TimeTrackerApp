@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FastForward
 import androidx.compose.runtime.Composable
@@ -17,20 +18,47 @@ import androidx.compose.ui.unit.dp
 import com.github.jetbrains.timetracker.androidapp.model.WorkActivity
 import com.github.jetbrains.timetracker.androidapp.ui.theme.TimeTrackerAppTheme
 import com.github.jetbrains.timetracker.androidapp.util.createTestActivities
+import java.util.*
 
 @Composable
 fun SuggestionsView(
-    workActivities: List<WorkActivity>,
+    lastCompleted: List<WorkActivity>,
+    suggestions: List<WorkActivity>,
     onCardClicked: (WorkActivity) -> Unit,
 ) {
-    LazyColumn {
-        items(workActivities) { activity ->
-            SuggestionCard(
-                workActivity = activity,
-                onActivityClicked = onCardClicked,
-            )
+    if (lastCompleted.isNotEmpty()) {
+        Subtitle("Continue")
+        LazyColumn {
+            items(lastCompleted) { lastCompleted ->
+                SuggestionCard(
+                    workActivity = lastCompleted,
+                    onActivityClicked = onCardClicked,
+                )
+            }
+        }
+        Spacer(Modifier.height(12.dp))
+    }
+    if (suggestions.isNotEmpty()) {
+        Subtitle("Quick start")
+        LazyColumn {
+            items(suggestions) { suggestion ->
+                SuggestionCard(
+                    workActivity = suggestion,
+                    onActivityClicked = onCardClicked,
+                )
+            }
         }
     }
+}
+
+@Composable
+fun Subtitle(text: String) {
+    Text(
+        modifier = Modifier.padding(start = 12.dp),
+        color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+        style = MaterialTheme.typography.overline,
+        text = text.uppercase(Locale.getDefault())
+    )
 }
 
 @Composable
@@ -60,8 +88,7 @@ fun SuggestionCard(
             }
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier
-                        .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(
                     imageVector = Icons.Filled.FastForward,
@@ -77,9 +104,11 @@ fun SuggestionCard(
 @Preview(showBackground = true)
 @Composable
 fun SuggestionsPreview() {
+    val activities = createTestActivities()
     TimeTrackerAppTheme {
         SuggestionsView(
-            workActivities = createTestActivities(),
+            lastCompleted = activities.take(1),
+            suggestions = activities.drop(1),
             onCardClicked = {},
         )
     }

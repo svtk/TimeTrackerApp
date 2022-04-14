@@ -9,7 +9,7 @@ interface SlicesRepository : KoinComponent {
 
     fun observeFinishedSlices(): Flow<List<WorkSlice>>
 
-    fun observeWorkActivitiesSuggestions(): Flow<List<WorkActivity>>
+    fun observeWorkActivitiesSuggestions(): Flow<WorkActivitySuggestions>
 
     suspend fun getFinishedSlice(id: UUID): Result<WorkSlice?>
 

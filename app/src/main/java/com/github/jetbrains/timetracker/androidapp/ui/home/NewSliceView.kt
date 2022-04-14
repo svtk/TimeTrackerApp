@@ -22,9 +22,10 @@ fun NewSliceView(
     timerViewModel: TimerViewModel = getViewModel(),
     navigateToRunningSlice: () -> Unit,
 ) {
-    val workActivities by timerViewModel.workActivities.collectAsState()
+    val suggestions by timerViewModel.suggestions.collectAsState()
     NewSliceView(
-        workActivities = workActivities,
+        lastCompleted = suggestions.lastCompleted,
+        suggestions = suggestions.suggestions,
         currentDescription = timerViewModel.currentDescription,
         onDescriptionUpdate = timerViewModel::updateDescription,
         onNewSlice = {
@@ -37,7 +38,8 @@ fun NewSliceView(
 
 @Composable
 fun NewSliceView(
-    workActivities: List<WorkActivity>,
+    lastCompleted: List<WorkActivity>,
+    suggestions: List<WorkActivity>,
     currentDescription: String,
     onDescriptionUpdate: (String) -> Unit,
     onNewSlice: () -> Unit,
@@ -53,7 +55,8 @@ fun NewSliceView(
         )
         Spacer(Modifier.height(16.dp))
         SuggestionsView(
-            workActivities = workActivities,
+            suggestions = suggestions,
+            lastCompleted = lastCompleted,
             onCardClicked = onCardClicked,
         )
     }
@@ -95,17 +98,18 @@ fun StartingNewSlice(
 @Preview(showBackground = true)
 @Composable
 fun TimerScreenPreview() {
+    val workActivities = createTestActivities()
     TimeTrackerAppTheme {
         Surface(
             color = MaterialTheme.colors.background
         ) {
             NewSliceView(
-                workActivities = createTestActivities(),
+                lastCompleted = workActivities.take(1),
+                suggestions = workActivities.drop(1),
                 currentDescription = "",
                 onDescriptionUpdate = {},
                 onNewSlice = {},
-                onCardClicked = {},
-            )
+            ) {}
         }
     }
 }

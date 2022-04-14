@@ -38,9 +38,8 @@ class FirestoreSlicesRepository : SlicesRepository {
         } ?: emptyFlow()
     }
 
-    override fun observeWorkActivitiesSuggestions(): Flow<List<WorkActivity>> {
-        // TODO
-        return emptyFlow()
+    override fun observeWorkActivitiesSuggestions(): Flow<WorkActivitySuggestions> {
+        return observeFinishedSlices().map { it.buildActivitySuggestions() }
     }
 
     override suspend fun getFinishedSlice(id: UUID): Result<WorkSlice?> =

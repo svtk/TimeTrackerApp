@@ -23,9 +23,8 @@ class FakeSlicesRepository : SlicesRepository {
         return finishedSlicesStateFlow
     }
 
-    override fun observeWorkActivitiesSuggestions(): Flow<List<WorkActivity>> {
-        return finishedSlicesStateFlow
-            .map { list -> list.map { slice -> WorkActivity(slice.project, slice.task, slice.description) }.distinct() }
+    override fun observeWorkActivitiesSuggestions(): Flow<WorkActivitySuggestions> {
+        return finishedSlicesStateFlow.map { it.buildActivitySuggestions() }
     }
 
     override suspend fun getFinishedSlice(id: UUID): Result<WorkSlice?> {
