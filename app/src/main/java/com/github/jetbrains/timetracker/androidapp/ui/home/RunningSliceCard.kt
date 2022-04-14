@@ -1,23 +1,24 @@
 package com.github.jetbrains.timetracker.androidapp.ui.home
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.StopCircle
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.github.jetbrains.timetracker.androidapp.model.WorkActivity
 import com.github.jetbrains.timetracker.androidapp.model.WorkSlice
+import com.github.jetbrains.timetracker.androidapp.ui.slice.ActionButton
+import com.github.jetbrains.timetracker.androidapp.ui.slice.DescriptionText
 import com.github.jetbrains.timetracker.androidapp.ui.theme.TimeTrackerAppTheme
 import com.github.jetbrains.timetracker.androidapp.util.createTestRunningSlice
 import com.github.jetbrains.timetracker.androidapp.util.renderDuration
@@ -46,10 +47,7 @@ fun RunningSliceCard(
                     style = MaterialTheme.typography.h4,
                     text = duration.renderDuration(slice.state),
                 )
-                DescriptionText(slice)
-                if (slice.project.value.isNotEmpty()) {
-                    ProjectText(slice)
-                }
+                DescriptionText(slice.activity)
             }
             val size = 48.dp
             if (slice.state == WorkSlice.State.RUNNING) {
@@ -75,74 +73,6 @@ fun RunningSliceCard(
     }
 }
 
-@Composable
-fun ProjectText(slice: WorkSlice) {
-    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-        Text(
-            style = MaterialTheme.typography.caption,
-            overflow = TextOverflow.Ellipsis,
-            softWrap = false,
-            text = slice.project.value +
-                    if (slice.task.value.isNotEmpty()) ": ${slice.task.value}" else ""
-        )
-    }
-}
-
-@Composable
-fun ProjectText(workActivity: WorkActivity) {
-    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-        Text(
-            style = MaterialTheme.typography.caption,
-            overflow = TextOverflow.Ellipsis,
-            softWrap = false,
-            text = workActivity.project.value +
-                    if (workActivity.task.value.isNotEmpty()) ": ${workActivity.task.value}" else ""
-        )
-    }
-}
-
-
-@Composable
-fun DescriptionText(slice: WorkSlice) {
-    Text(
-        style = MaterialTheme.typography.body1,
-        overflow = TextOverflow.Ellipsis,
-        softWrap = false,
-        text = slice.description.value,
-    )
-}
-// TODO
-@Composable
-fun DescriptionText(workActivity: WorkActivity) {
-    Text(
-        style = MaterialTheme.typography.body1,
-        overflow = TextOverflow.Ellipsis,
-        softWrap = false,
-        text = workActivity.description.value,
-    )
-}
-
-@Composable
-fun ActionButton(
-    modifier: Modifier,
-    contentDescription: String,
-    imageVector: ImageVector,
-    color: Color,
-    size: Dp,
-    onClick: () -> Unit,
-) {
-    IconButton(
-        modifier = modifier,
-        onClick = onClick,
-    ) {
-        Icon(
-            imageVector = imageVector,
-            contentDescription = contentDescription,
-            modifier = Modifier.size(size),
-            tint = color,
-        )
-    }
-}
 
 @Preview(showBackground = true)
 @Composable

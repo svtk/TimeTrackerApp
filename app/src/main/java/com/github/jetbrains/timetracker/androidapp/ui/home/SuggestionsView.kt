@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FastForward
 import androidx.compose.runtime.Composable
@@ -16,9 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.jetbrains.timetracker.androidapp.model.WorkActivity
+import com.github.jetbrains.timetracker.androidapp.ui.slice.DescriptionText
+import com.github.jetbrains.timetracker.androidapp.ui.slice.Subtitle
 import com.github.jetbrains.timetracker.androidapp.ui.theme.TimeTrackerAppTheme
 import com.github.jetbrains.timetracker.androidapp.util.createTestActivities
-import java.util.*
 
 @Composable
 fun SuggestionsView(
@@ -52,16 +52,6 @@ fun SuggestionsView(
 }
 
 @Composable
-fun Subtitle(text: String) {
-    Text(
-        modifier = Modifier.padding(start = 12.dp),
-        color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
-        style = MaterialTheme.typography.overline,
-        text = text.uppercase(Locale.getDefault())
-    )
-}
-
-@Composable
 fun SuggestionCard(
     workActivity: WorkActivity,
     onActivityClicked: (WorkActivity) -> Unit,
@@ -82,9 +72,6 @@ fun SuggestionCard(
                     .fillMaxWidth(0.8f)
             ) {
                 DescriptionText(workActivity)
-                if (workActivity.project.value.isNotEmpty()) {
-                    ProjectText(workActivity)
-                }
             }
             Box(
                 contentAlignment = Alignment.Center,

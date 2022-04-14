@@ -15,7 +15,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.jetbrains.timetracker.androidapp.model.*
-import com.github.jetbrains.timetracker.androidapp.ui.home.ActionButton
 import com.github.jetbrains.timetracker.androidapp.ui.theme.TimeTrackerAppTheme
 import com.github.jetbrains.timetracker.androidapp.ui.util.DatePicker
 import com.github.jetbrains.timetracker.androidapp.ui.util.TimePicker
@@ -37,14 +36,16 @@ fun SliceDetailedView(
     Card(Modifier.padding(12.dp)) {
         Column(Modifier.padding(12.dp)) {
             SliceItem(
-                "Description", slice.description.value, sliceInfoUpdates.onDescriptionChanged,
+                "Description",
+                slice.activity.description.value,
+                sliceInfoUpdates.onDescriptionChanged,
                 colors = TextFieldDefaults.changeBorderColor(),
             )
             SliceItem(
-                "Project", slice.project.value, sliceInfoUpdates.onProjectChanged,
+                "Project", slice.activity.project?.value ?: "", sliceInfoUpdates.onProjectChanged,
             )
             SliceItem(
-                "Task", slice.task.value, sliceInfoUpdates.onTaskChanged,
+                "Task", slice.activity.task?.value ?: "", sliceInfoUpdates.onTaskChanged,
                 colors = TextFieldDefaults.changeBorderColor(),
             )
             DateTimeFields(
@@ -185,9 +186,11 @@ fun FinishedSliceDetailedViewPreview() {
         SliceDetailedView(
             slice = WorkSlice(
                 id = UUID.randomUUID(),
-                project = Project("my project"),
-                task = Task("my task"),
-                description = Description("my work"),
+                activity = WorkActivity(
+                    project = Project("my project"),
+                    task = Task("my task"),
+                    description = Description("my work"),
+                ),
                 startInstant = createTestInstant("2022-01-26T11:30"),
                 finishInstant = createTestInstant("2022-01-26T13:00"),
                 duration = 1.hours,
@@ -211,9 +214,11 @@ fun RunningSliceDetailedViewPreview() {
         SliceDetailedView(
             slice = WorkSlice(
                 id = UUID.randomUUID(),
-                project = Project("my project"),
-                task = Task("my task"),
-                description = Description("my work"),
+                activity = WorkActivity(
+                    project = Project("my project"),
+                    task = Task("my task"),
+                    description = Description("my work"),
+                ),
                 startInstant = createTestInstant("2022-01-26T11:30"),
                 finishInstant = createTestInstant("2022-01-26T13:00"),
                 duration = 50.minutes,

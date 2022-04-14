@@ -6,9 +6,7 @@ import kotlin.time.Duration
 
 data class RunningSlice(
     val id: UUID = UUID.randomUUID(),
-    val project: Project,
-    val task: Task,
-    val description: Description,
+    val activity: WorkActivity,
     val isPaused: Boolean = false,
     val intervals: List<TimeInterval> = listOf(OpenTimeInterval()),
 ) {
@@ -40,9 +38,7 @@ fun RunningSlice.resume(): RunningSlice =
 
 fun RunningSlice.finish(): WorkSlice = WorkSlice(
     id = id,
-    project = project,
-    task = task,
-    description = description,
+    activity = activity,
     startInstant = startInstant,
     finishInstant = countCurrentFinishInstant(),
     duration = countCurrentDuration(),

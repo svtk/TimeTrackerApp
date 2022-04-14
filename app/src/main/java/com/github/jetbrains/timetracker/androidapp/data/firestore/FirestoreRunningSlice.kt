@@ -29,9 +29,9 @@ data class FirestoreTimeInterval(
 fun RunningSlice.toFirestoreRunningSlice() =
     FirestoreRunningSlice(
         id = id.toString(),
-        project = project.value,
-        task = task.value,
-        description = description.value,
+        project = activity.project?.value,
+        task = activity.task?.value,
+        description = activity.description.value,
         isPaused = isPaused,
         intervals = intervals.map { it.toFirestoreTimeInterval() }
     )
@@ -40,9 +40,11 @@ fun FirestoreRunningSlice.toRunningSlice(): RunningSlice? {
     if (id == null) return null
     return RunningSlice(
         id = UUID.fromString(id),
-        project = Project(project!!),
-        task = Task(task!!),
-        description = Description(description!!),
+        activity = WorkActivity(
+            project = project?.let { Project(project) },
+            task = task?.let { Task(task) },
+            description = Description(description!!),
+        ),
         isPaused = isPaused!!,
         intervals = intervals!!.map { it.toTimeInterval() },
     )

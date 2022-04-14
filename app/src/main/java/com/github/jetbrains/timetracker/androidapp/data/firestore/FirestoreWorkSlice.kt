@@ -1,9 +1,6 @@
 package com.github.jetbrains.timetracker.androidapp.data.firestore
 
-import com.github.jetbrains.timetracker.androidapp.model.Description
-import com.github.jetbrains.timetracker.androidapp.model.Project
-import com.github.jetbrains.timetracker.androidapp.model.Task
-import com.github.jetbrains.timetracker.androidapp.model.WorkSlice
+import com.github.jetbrains.timetracker.androidapp.model.*
 import kotlinx.datetime.Instant
 import java.util.*
 import kotlin.time.Duration.Companion.milliseconds
@@ -21,9 +18,9 @@ data class FirestoreWorkSlice(
 
 fun WorkSlice.toFirestoreWorkSlice() = FirestoreWorkSlice(
     id = id.toString(),
-    project = project.value,
-    task = task.value,
-    description = description.value,
+    project = activity.project?.value,
+    task = activity.task?.value,
+    description = activity.description.value,
     startInstantMillis = startInstant.toEpochMilliseconds(),
     finishInstantMillis = finishInstant.toEpochMilliseconds(),
     durationMillis = duration.inWholeMilliseconds,
@@ -34,9 +31,11 @@ fun FirestoreWorkSlice.toWorkSlice(): WorkSlice? {
     if (id == null) return null
     return WorkSlice(
         id = UUID.fromString(id),
-        project = Project(project!!),
-        task = Task(task!!),
-        description = Description(description!!),
+        activity = WorkActivity(
+            project = project?.let { Project(project)},
+            task = task?.let { Task(task) },
+            description = Description(description!!),
+        ),
         startInstant = Instant.fromEpochMilliseconds(startInstantMillis!!),
         finishInstant = Instant.fromEpochMilliseconds(finishInstantMillis!!),
         duration = durationMillis!!.milliseconds,

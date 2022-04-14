@@ -1,23 +1,20 @@
 package com.github.jetbrains.timetracker.androidapp.ui.home
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayCircle
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.github.jetbrains.timetracker.androidapp.model.Description
-import com.github.jetbrains.timetracker.androidapp.model.Project
-import com.github.jetbrains.timetracker.androidapp.model.Task
-import com.github.jetbrains.timetracker.androidapp.model.WorkSlice
+import com.github.jetbrains.timetracker.androidapp.model.*
 import com.github.jetbrains.timetracker.androidapp.ui.theme.TimeTrackerAppTheme
-import com.github.jetbrains.timetracker.androidapp.util.changeBorderColor
 import com.github.jetbrains.timetracker.androidapp.util.createTestInstant
 import com.github.jetbrains.timetracker.androidapp.util.createTestSlices
 import org.koin.androidx.compose.getViewModel
@@ -81,9 +78,11 @@ fun HomeScreenRunningTaskPreview() {
             LogsView(
                 slice = WorkSlice(
                     UUID.randomUUID(),
-                    Project("my Project"),
-                    Task("my Task"),
-                    Description("my description"),
+                    activity = WorkActivity(
+                        Project("my Project"),
+                        Task("my Task"),
+                        Description("my description"),
+                    ),
                     startInstant = createTestInstant("2022-01-26T11:30"),
                     finishInstant = createTestInstant("2022-01-26T13:00"),
                     duration = 50.minutes,

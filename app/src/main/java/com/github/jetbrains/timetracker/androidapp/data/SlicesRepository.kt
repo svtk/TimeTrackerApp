@@ -17,7 +17,7 @@ interface SlicesRepository : KoinComponent {
 
     fun observeRunningSlice(): Flow<RunningSlice?>
 
-    suspend fun startRunningSlice(description: Description, task: Task, project: Project)
+    suspend fun startRunningSlice(description: Description, task: Task?, project: Project?)
 
     suspend fun updateRunningSlice(sliceChanges: SliceChanges)
 

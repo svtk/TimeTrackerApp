@@ -6,9 +6,7 @@ import kotlin.time.Duration
 
 data class WorkSlice(
     val id: UUID,
-    val project: Project,
-    val task: Task,
-    val description: Description,
+    val activity: WorkActivity,
     val startInstant: Instant,
     val finishInstant: Instant,
     val duration: Duration,
@@ -20,13 +18,10 @@ data class WorkSlice(
 }
 
 data class WorkActivity(
-    val project: Project,
-    val task: Task,
+    val project: Project?,
+    val task: Task?,
     val description: Description,
 )
-
-@Deprecated("TODO store work activity inside work slice")
-fun WorkSlice.toWorkActivity() = WorkActivity(project, task, description)
 
 data class Project(val value: String)
 

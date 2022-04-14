@@ -13,7 +13,7 @@ private val RECENT_INTERVAL = 1.minutes
 fun List<WorkSlice>.buildActivitySuggestions(): WorkActivitySuggestions {
     if (this.isEmpty()) return WorkActivitySuggestions()
 
-    val withLatestFinishInstants = this.groupBy { it.toWorkActivity() }
+    val withLatestFinishInstants = this.groupBy { it.activity }
         .map { (activity, slices) -> Pair(activity, slices.maxOf { it.finishInstant }) }
     val sorted = withLatestFinishInstants.sortedByDescending { it.second }
     val theMostRecent = sorted.first()

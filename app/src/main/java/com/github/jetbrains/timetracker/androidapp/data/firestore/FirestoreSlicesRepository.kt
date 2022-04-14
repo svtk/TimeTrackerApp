@@ -62,11 +62,13 @@ class FirestoreSlicesRepository : SlicesRepository {
         }
     } ?: emptyFlow()
 
-    override suspend fun startRunningSlice(description: Description, task: Task, project: Project) {
+    override suspend fun startRunningSlice(description: Description, task: Task?, project: Project?) {
         val runningSlice = RunningSlice(
-            project = project,
-            task = task,
-            description = description,
+            activity = WorkActivity(
+                project = project,
+                task = task,
+                description = description,
+            )
         )
         updateRunningSlice(runningSlice)
     }

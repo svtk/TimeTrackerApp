@@ -25,9 +25,7 @@ fun WorkSlice.applyChanges(sliceChanges: SliceChanges?): WorkSlice {
         sliceChanges.newFinishDate, sliceChanges.newFinishTime
     )
     return copy(
-        project = sliceChanges.newProject ?: project,
-        task = sliceChanges.newTask ?: task,
-        description = sliceChanges.newDescription ?: description,
+        activity = activity.applyChanges(sliceChanges),
         startInstant = newStartInstant,
         finishInstant = newFinishInstant,
         duration = sliceChanges.newDuration ?: duration,
@@ -40,9 +38,7 @@ fun RunningSlice.applyChanges(sliceChanges: SliceChanges?): RunningSlice {
         sliceChanges.newStartDate, sliceChanges.newStartTime
     )
     return copy(
-        project = sliceChanges.newProject ?: project,
-        task = sliceChanges.newTask ?: task,
-        description = sliceChanges.newDescription ?: description,
+        activity = activity.applyChanges(sliceChanges),
         intervals = if (newStartInstant != startInstant) {
             val initialIntervals = intervals.filter { !it.isArtificial }
             listOf(
@@ -55,3 +51,11 @@ fun RunningSlice.applyChanges(sliceChanges: SliceChanges?): RunningSlice {
         } else intervals
     )
 }
+
+private fun WorkActivity.applyChanges(
+    sliceChanges: SliceChanges
+) = copy(
+    project = sliceChanges.newProject ?: project,
+    task = sliceChanges.newTask ?: task,
+    description = sliceChanges.newDescription ?: description,
+)

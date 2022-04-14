@@ -59,9 +59,7 @@ fun Flow<RunningSlice?>.convertToWorkSliceAndEmitEverySecond(
             it?.let { runningSlice ->
                 WorkSlice(
                     id = runningSlice.id,
-                    project = runningSlice.project,
-                    task = runningSlice.task,
-                    description = runningSlice.description,
+                    activity = runningSlice.activity,
                     startInstant = runningSlice.startInstant,
                     // we update duration and finish time every second:
                     finishInstant = runningSlice.countCurrentFinishInstant(),

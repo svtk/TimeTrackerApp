@@ -45,11 +45,13 @@ class FakeSlicesRepository : SlicesRepository {
         return runningSliceStateFlow
     }
 
-    override suspend fun startRunningSlice(description: Description, task: Task, project: Project) {
+    override suspend fun startRunningSlice(description: Description, task: Task?, project: Project?) {
         runningSliceStateFlow.value = RunningSlice(
-            project = project,
-            task = task,
-            description = description,
+            activity = WorkActivity(
+                project = project,
+                task = task,
+                description = description,
+            )
         )
     }
 

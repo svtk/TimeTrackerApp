@@ -46,7 +46,9 @@ class TimerViewModel(
     }
 
     private fun startNewSlice(
-        description: String, project: Project, task: Task
+        description: String,
+        project: Project?,
+        task: Task?
     ) {
         updateDescription("")
         viewModelScope.launch {
@@ -60,8 +62,8 @@ class TimerViewModel(
 
     fun startNewSlice() = startNewSlice(
         currentDescription,
-        Project(""),
-        Task(""),
+        project = null,
+        task = null,
     )
 
     fun startSimilarActivity(workActivity: WorkActivity) {
