@@ -9,19 +9,49 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.*
 
-class FakeSlicesRepository : SlicesRepository {
+class FakeSlicesRepository(
+    fakeData: FakeData
+) : SlicesRepository {
     // "fake" in-memory implementation
     private var runningSliceStateFlow = MutableStateFlow<RunningSlice?>(null)
 
-    private var finishedSlicesStateFlow = MutableStateFlow(listOf<WorkSlice>())
+//    private var finishedSlices by mutableStateOf(FakeData.randomSlices)
+
+    private var finishedSlicesStateFlow = MutableStateFlow(fakeData.randomSlices)
 
     private val mutex = Mutex()
 
     private fun findSliceById(id: UUID?) = finishedSlicesStateFlow.value.find { it.id == id }
 
-    override fun observeFinishedSlices(): Flow<List<WorkSlice>> {
-        return finishedSlicesStateFlow
+    override suspend fun getTimeRanges(): List<TimeRange> {
+        val finishedSlices = finishedSlicesStateFlow.value
+        if (finishedSlices.isEmpty()) return emptyList()
+
+        val first = finishedSlices.minOf { it.startInstant }
+        val last = finishedSlices.maxOf { it.startInstant }
+        return createWeeksRanges(first, last)
     }
+
+    override fun observeFinishedSlices(timeRange: TimeRange): Flow<WorkSlicesByDays> {
+        return finishedSlicesStateFlow
+            .map { list ->
+                list
+                    .filter { slice -> slice.startInstant in timeRange }
+                    .toWorkSlicesByDays()
+            }
+    }
+
+    override fun getFinishedSlices(timeRange: TimeRange): Result<WorkSlicesByDays> {
+        return Result.success(
+            finishedSlicesStateFlow.value
+                .filter { it.startInstant in timeRange }
+                .toWorkSlicesByDays()
+        )
+    }
+
+//    override fun observeFinishedSlices(): Flow<List<WorkSlice>> {
+//        return finishedSlicesStateFlow
+//    }
 
     override fun observeWorkActivitiesSuggestions(): Flow<WorkActivitySuggestions> {
         return finishedSlicesStateFlow.map { it.buildActivitySuggestions() }
@@ -36,7 +66,7 @@ class FakeSlicesRepository : SlicesRepository {
             val oldSlice = findSliceById(id) ?: return
             finishedSlicesStateFlow.update { oldSlicesState ->
                 val newSlice = oldSlice.applyChanges(sliceChanges)
-                (oldSlicesState - oldSlice + newSlice).sortedBy { it.startInstant }
+                oldSlicesState - oldSlice + newSlice
             }
         }
     }
@@ -45,7 +75,11 @@ class FakeSlicesRepository : SlicesRepository {
         return runningSliceStateFlow
     }
 
-    override suspend fun startRunningSlice(description: Description, task: Task?, project: Project?) {
+    override suspend fun startRunningSlice(
+        description: Description,
+        task: Task?,
+        project: Project?
+    ) {
         runningSliceStateFlow.value = RunningSlice(
             activity = WorkActivity(
                 project = project,

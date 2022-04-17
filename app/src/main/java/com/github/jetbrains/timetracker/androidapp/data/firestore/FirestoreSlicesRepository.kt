@@ -28,7 +28,7 @@ class FirestoreSlicesRepository : SlicesRepository {
     // TODO Store timestamps and reduce the number of operations
     // https://medium.com/firebase-tips-tricks/how-to-drastically-reduce-the-number-of-reads-when-no-documents-are-changed-in-firestore-8760e2f25e9e
 
-    override fun observeFinishedSlices(): Flow<List<WorkSlice>> {
+    fun observeFinishedSlices(): Flow<List<WorkSlice>> {
         return withFinishedSlices {
             snapshots.map { querySnapshot ->
                 querySnapshot
@@ -36,6 +36,18 @@ class FirestoreSlicesRepository : SlicesRepository {
                     .mapNotNull { it.toObject<FirestoreWorkSlice>()?.toWorkSlice() }
             }
         } ?: emptyFlow()
+    }
+
+    override suspend fun getTimeRanges(): List<TimeRange> {
+        TODO("Not yet implemented")
+    }
+
+    override fun observeFinishedSlices(timeRange: TimeRange): Flow<WorkSlicesByDays> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getFinishedSlices(timeRange: TimeRange): Result<WorkSlicesByDays> {
+        TODO("Not yet implemented")
     }
 
     override fun observeWorkActivitiesSuggestions(): Flow<WorkActivitySuggestions> {

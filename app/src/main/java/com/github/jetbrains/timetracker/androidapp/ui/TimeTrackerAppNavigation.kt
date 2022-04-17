@@ -4,10 +4,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.MoreTime
-import androidx.compose.material.icons.filled.Subject
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -20,6 +17,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.github.jetbrains.timetracker.androidapp.ui.home.LogsView
+import com.github.jetbrains.timetracker.androidapp.ui.home.TodayView
 import com.github.jetbrains.timetracker.androidapp.ui.slice.FinishedSliceView
 import com.github.jetbrains.timetracker.androidapp.ui.slice.RunningSliceView
 import com.github.jetbrains.timetracker.androidapp.ui.theme.TimeTrackerAppTheme
@@ -34,6 +32,10 @@ enum class TimeTrackerScreen(
     Timer(
         title = "Timer",
         icon = Icons.Filled.MoreTime
+    ),
+    Today(
+        title = "Today",
+        icon = Icons.Filled.Today
     ),
     Logs(
         title = "Logs",
@@ -55,6 +57,7 @@ enum class TimeTrackerScreen(
         fun fromRoute(route: String?): TimeTrackerScreen =
             when (route?.substringBefore("/")) {
                 Timer.name, null -> Timer
+                Today.name -> Today
                 Logs.name -> Logs
                 Account.name -> Account
                 Slice.name -> Slice
@@ -87,6 +90,9 @@ fun BottomNavigationBar(
     BottomNavigation {
         TimeTrackerBottomNavigationItem(
             item = TimeTrackerScreen.Timer,
+        )
+        TimeTrackerBottomNavigationItem(
+            item = TimeTrackerScreen.Today,
         )
         TimeTrackerBottomNavigationItem(
             item = TimeTrackerScreen.Logs,
@@ -160,6 +166,12 @@ fun TimeTrackerNavHost(
     ) {
         composable(TimeTrackerScreen.Logs.name) {
             LogsView(
+                navigateToRunningSlice = { navController.navigate(TimeTrackerScreen.Timer.name) },
+                navigateToChosenSlice = { id -> navController.navigate("${TimeTrackerScreen.Slice.name}/$id") },
+            )
+        }
+        composable(TimeTrackerScreen.Today.name) {
+            TodayView(
                 navigateToRunningSlice = { navController.navigate(TimeTrackerScreen.Timer.name) },
                 navigateToChosenSlice = { id -> navController.navigate("${TimeTrackerScreen.Slice.name}/$id") },
             )

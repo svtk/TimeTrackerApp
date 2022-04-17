@@ -35,9 +35,9 @@ fun DescriptionText(workActivity: WorkActivity) {
 }
 
 @Composable
-fun Subtitle(text: String) {
+fun Subtitle(text: String, modifier: Modifier = Modifier) {
     Text(
-        modifier = Modifier.padding(start = 12.dp),
+        modifier = modifier.padding(start = 12.dp),
         color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
         style = MaterialTheme.typography.overline,
         text = text.uppercase(Locale.getDefault())

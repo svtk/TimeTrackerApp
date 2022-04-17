@@ -5,7 +5,7 @@ import java.util.*
 import kotlin.time.Duration
 
 data class WorkSlice(
-    val id: UUID,
+    val id: UUID = UUID.randomUUID(),
     val activity: WorkActivity,
     val startInstant: Instant,
     val finishInstant: Instant,

@@ -26,13 +26,6 @@ class TimerViewModel(
             .observeRunningSlice()
             .convertToWorkSliceAndEmitEverySecond(viewModelScope, tickHandler.tickFlow)
 
-    val finishedSlices: StateFlow<List<WorkSlice>> =
-        repository.observeFinishedSlices().stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(),
-            emptyList()
-        )
-
     val suggestions: StateFlow<WorkActivitySuggestions> =
         repository.observeWorkActivitiesSuggestions()
             .stateIn(

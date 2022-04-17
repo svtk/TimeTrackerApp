@@ -4,9 +4,11 @@ import android.app.Application
 import com.github.jetbrains.timetracker.androidapp.auth.AuthenticationProvider
 import com.github.jetbrains.timetracker.androidapp.auth.FakeAuthenticationProvider
 import com.github.jetbrains.timetracker.androidapp.auth.firebase.FirebaseAuthenticationProvider
+import com.github.jetbrains.timetracker.androidapp.data.FakeData
 import com.github.jetbrains.timetracker.androidapp.data.FakeSlicesRepository
 import com.github.jetbrains.timetracker.androidapp.data.SlicesRepository
 import com.github.jetbrains.timetracker.androidapp.data.firestore.FirestoreSlicesRepository
+import com.github.jetbrains.timetracker.androidapp.ui.home.LogsViewModel
 import com.github.jetbrains.timetracker.androidapp.ui.home.TimerViewModel
 import com.github.jetbrains.timetracker.androidapp.ui.slice.FinishedSliceViewModel
 import com.github.jetbrains.timetracker.androidapp.ui.slice.RunningSliceViewModel
@@ -34,11 +36,12 @@ class MainApp : Application() {
                 else
                     FakeAuthenticationProvider()
             }
+            single<FakeData> { FakeData }
             single<SlicesRepository> {
                 if (useFirebase)
                     FirestoreSlicesRepository()
                 else
-                    FakeSlicesRepository()
+                    FakeSlicesRepository(get())
             }
             if (useFirebase && BuildConfig.DEBUG) {
                 setUpFirebaseEmulator()
@@ -46,6 +49,7 @@ class MainApp : Application() {
 
             viewModel { TimerViewModel(get()) }
             viewModel { RunningSliceViewModel(get()) }
+            viewModel { LogsViewModel(get()) }
             viewModel { FinishedSliceViewModel(get()) }
         }
 

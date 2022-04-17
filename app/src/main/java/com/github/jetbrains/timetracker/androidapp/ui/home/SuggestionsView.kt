@@ -9,6 +9,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FastForward
+import androidx.compose.material.icons.filled.Notes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -78,7 +79,8 @@ fun SuggestionCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(
-                    imageVector = Icons.Filled.FastForward,
+//                    imageVector = Icons.Filled.FastForward,
+                    imageVector = Icons.Filled.Notes,
                     modifier = Modifier.size(32.dp),
                     contentDescription = "Start",
                     tint = MaterialTheme.colors.onBackground.copy(alpha = 0.4f),

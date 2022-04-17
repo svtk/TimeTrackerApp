@@ -2,69 +2,81 @@ package com.github.jetbrains.timetracker.androidapp.ui.home
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.jetbrains.timetracker.androidapp.model.*
 import com.github.jetbrains.timetracker.androidapp.ui.theme.TimeTrackerAppTheme
-import com.github.jetbrains.timetracker.androidapp.util.createTestInstant
 import com.github.jetbrains.timetracker.androidapp.util.createTestSlices
+import com.github.jetbrains.timetracker.androidapp.util.createTestTimeRanges
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 import java.util.*
-import kotlin.time.Duration.Companion.minutes
 
 @Composable
 fun LogsView(
-    timerViewModel: TimerViewModel = getViewModel(),
+    logsViewModel: LogsViewModel = getViewModel(),
     navigateToRunningSlice: () -> Unit,
     navigateToChosenSlice: (UUID) -> Unit,
 ) {
-    val finishedSlices by timerViewModel.finishedSlices.collectAsState()
-    val runningSlice by timerViewModel.runningSlice.collectAsState(null)
+    val finishedSlicesByDays = logsViewModel.finishedSlices
+//    val runningSlice by logsViewModel.runningSlice.collectAsState(null)
     LogsView(
-        slice = runningSlice,
-        finishedSlices = finishedSlices,
+        timeRangesTabs = logsViewModel.timeRanges,
+        finishedSlicesByDays = finishedSlicesByDays,
+        onChangingTimeRange = logsViewModel::updateTimeRange,
         onCardClicked = navigateToChosenSlice,
-        onCurrentSliceClicked = navigateToRunningSlice,
-        onCurrentSliceResumed = timerViewModel::resumeRunningSlice,
-        onCurrentSliceFinished = timerViewModel::finishRunningSlice,
     )
 }
 
 @Composable
 fun LogsView(
-    slice: WorkSlice?,
-    finishedSlices: List<WorkSlice>,
+    timeRangesTabs: List<TimeRange>,
+    finishedSlicesByDays: WorkSlicesByDays?,
+    onChangingTimeRange: (Int) -> Unit,
     onCardClicked: (id: UUID) -> Unit,
-    onCurrentSliceClicked: () -> Unit,
-    onCurrentSliceResumed: () -> Unit,
-    onCurrentSliceFinished: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier.padding(8.dp)
-    ) {
-        if (slice != null) {
-            RunningSliceCard(
-                slice = slice,
-                duration = slice.duration,
-                onCardClicked = onCurrentSliceClicked,
-                onResumeClicked = onCurrentSliceResumed,
-                onFinishClicked = onCurrentSliceFinished,
-            )
-            Spacer(Modifier.height(16.dp))
+    Column {
+        var selectedIndex by remember { mutableStateOf(timeRangesTabs.lastIndex) }
+        val coroutineScope = rememberCoroutineScope()
+        val lazyListState: LazyListState = rememberLazyListState()
+        Column {
+            ScrollableTabRow(selectedTabIndex = selectedIndex) {
+                timeRangesTabs.forEachIndexed { index, timeRange ->
+                    Tab(
+                        text = { Text(
+                            text = timeRange.title,
+                            style = MaterialTheme.typography.overline,
+                        ) },
+                        selected = selectedIndex == index,
+                        onClick = {
+                            selectedIndex = index
+                            onChangingTimeRange(index)
+                            coroutineScope.launch {
+                                lazyListState.scrollToItem(0)
+                            }
+                        }
+                    )
+                }
+            }
         }
-        SliceListView(
-            slices = finishedSlices,
-            onCardClicked = onCardClicked,
-        )
+        if (finishedSlicesByDays != null) {
+            Column(
+                modifier = Modifier.padding(8.dp)
+            ) {
+                SliceListView(
+                    slicesByDays = finishedSlicesByDays,
+                    state = lazyListState,
+                    onCardClicked = onCardClicked,
+                )
+            }
+        }
     }
 }
 
@@ -76,23 +88,10 @@ fun HomeScreenRunningTaskPreview() {
             color = MaterialTheme.colors.background
         ) {
             LogsView(
-                slice = WorkSlice(
-                    UUID.randomUUID(),
-                    activity = WorkActivity(
-                        Project("my Project"),
-                        Task("my Task"),
-                        Description("my description"),
-                    ),
-                    startInstant = createTestInstant("2022-01-26T11:30"),
-                    finishInstant = createTestInstant("2022-01-26T13:00"),
-                    duration = 50.minutes,
-                    state = WorkSlice.State.RUNNING,
-                ),
-                finishedSlices = createTestSlices(),
+                timeRangesTabs = createTestTimeRanges(),
+                finishedSlicesByDays = createTestSlices().toWorkSlicesByDays(),
+                onChangingTimeRange = {},
                 onCardClicked = {},
-                onCurrentSliceClicked = {},
-                onCurrentSliceResumed = {},
-                onCurrentSliceFinished = {},
             )
         }
     }
@@ -111,12 +110,10 @@ fun HomeScreenChoosingTaskPreview() {
             color = MaterialTheme.colors.background
         ) {
             LogsView(
-                slice = null,
-                finishedSlices = createTestSlices(),
+                timeRangesTabs = createTestTimeRanges(),
+                finishedSlicesByDays = createTestSlices().toWorkSlicesByDays(),
+                onChangingTimeRange = {},
                 onCardClicked = {},
-                onCurrentSliceClicked = {},
-                onCurrentSliceResumed = {},
-                onCurrentSliceFinished = {},
             )
         }
     }

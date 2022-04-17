@@ -7,9 +7,13 @@ import java.util.*
 
 interface SlicesRepository : KoinComponent {
 
-    fun observeFinishedSlices(): Flow<List<WorkSlice>>
-
     fun observeWorkActivitiesSuggestions(): Flow<WorkActivitySuggestions>
+
+    suspend fun getTimeRanges(): List<TimeRange>
+
+    fun observeFinishedSlices(timeRange: TimeRange): Flow<WorkSlicesByDays>
+
+    fun getFinishedSlices(timeRange: TimeRange): Result<WorkSlicesByDays>
 
     suspend fun getFinishedSlice(id: UUID): Result<WorkSlice?>
 

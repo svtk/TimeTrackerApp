@@ -11,6 +11,14 @@ fun createTestInstant(isoDate: String) = LocalDateTime.parse(isoDate).toInstant(
     TimeZone.currentSystemDefault()
 )
 
+fun createTestTimeRanges(): List<TimeRange> {
+    val from = createTestInstant("2022-01-05T10:00")
+    val to = createTestInstant("2022-02-05T10:00")
+    return createWeeksRanges(from, to)
+}
+
+fun createTestSlicesByDays() = createTestSlices().toWorkSlicesByDays()
+
 fun createTestSlices() = listOf(
     WorkSlice(
         id = UUID.randomUUID(),
